@@ -46,7 +46,7 @@ def resize_image(imagePath , flag = 2):
     box=(FY4B_x, FY4B_y, FY4B_s+FY4B_x, FY4B_s+FY4B_y)
     img = img.crop(box)
     width, height = img.size
-    img.save("C:\\Users\\CAM\\Desktop\\FY-test\\resized_wallpaper01.jpg")
+    img.save("C:\\Users\\XXXX\\XXXX.jpg")
 
 
     #将图片裁剪为圆形
@@ -55,7 +55,7 @@ def resize_image(imagePath , flag = 2):
     draw.ellipse((0, 0, FY4B_s, FY4B_s), fill=255) # 绘制一个白色的圆形
     img.putalpha(mask) # 将圆形作为透明度掩码
     #resized_image = img
-    img.save("C:\\Users\\CAM\\Desktop\\FY-test\\resized_wallpaper02.png")
+    img.save("C:\\Users\\XXXX\\XXXX02.png")
 
     #设置缩放比
     if flag == 0:
@@ -82,14 +82,14 @@ def resize_image(imagePath , flag = 2):
     return resized_image
 
 # 定义一个变量，存储你想要的壁纸图片的路径
-# 你可以根据自己的需要修改这个路径
-wallpaper = "C:\\Users\\CAM\\Desktop\\FY-test\\20230416_170430.jpg"
+# 可以根据自己的需要修改这个路径
+wallpaper = "C:\\Users\\XXXX\\XXXX.jpg"
 
 # 调用resize_image函数，传入image_path变量作为参数
 # 得到返回的图片对象，并赋值给resized_image变量
 resized_image = resize_image(wallpaper , 2)
 
-resized_image_path = "C:\\Users\\CAM\\Desktop\\FY-test\\resized_wallpaper.jpg"
+resized_image_path = "C:\\Users\\XXXX\\XXXX.jpg"
 resized_image.save(resized_image_path)
 #time.sleep(1)   #延时1s，等待图片保存成功
 
