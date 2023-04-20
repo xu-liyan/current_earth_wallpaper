@@ -1,14 +1,11 @@
 '''
-用 Python 帮我写一个 Windows10系统自动设置桌面背景的程序，要求如下：
 1、启动程序之后，从网址“http://img.nsmc.org.cn/CLOUDIMAGE/FY4A/MTCC/FY4A_DISK.JPG”或
-“http://img.nsmc.org.cn/CLOUDIMAGE/FY4B/AGRI/GCLR/FY4B_DISK_GCLR.JPG”获取图片，并保存到指定文件夹，图片名称以获取图片的具体日期和时间命名。
-2、可以选择从哪个网址获取图片。
-3、每隔xx分钟获取一张图片，并根据当前显示屏分辨率，将图片设置为桌面背景。
-4、文件夹图片最大保存数量为48张，超过之后删除最先保存的一张图片。
-5、具有简单的GUI界面
-6、GUI窗口关闭后，最小化到托盘运行
+“http://img.nsmc.org.cn/CLOUDIMAGE/FY4B/AGRI/GCLR/FY4B_DISK_GCLR.JPG”获取图片，并保存到指定文件夹，图片名称以获取图片的具体日期和时间命名
+2、可以自行选择从哪个网址获取图片
+3、每隔xx分钟获取一张图片，并根据当前显示屏分辨率，将图片设置为桌面背景
+4、文件夹图片最大保存数量为96张，超过之后从最旧的文件开始依次删除，最终保留96张图片
+5、GUI窗口关闭后，程序最小化到托盘运行
 '''
-#增加图片缩放和裁剪处理，更换壁纸设置方式
 
 import os
 import ctypes
@@ -205,14 +202,14 @@ class DesktopBackgroundChanger:
         #     oldest_file = min(files, key=lambda x: os.path.getctime(self.save_path+x))
         #     os.remove(self.save_path+oldest_file)
 
-        # 统计文件数量,并删除超过48张的最早保存的图片
+        # 统计文件数量,超过95张之后，从最旧的文件开始依次删除，最终保留96张图片（新的壁纸，在删除多余的旧文件之后才生成，所以文件夹中图片数量为95+1）
         files = os.listdir(self.save_path)
         if len(files) > 95:
             # 对文件名按照创建时间排序，最新的在前面
             files.sort(key=lambda x: os.path.getctime(self.save_path+x), reverse=True)
-            # 计算超过48个的文件数量
+            # 计算超过95个的文件数量
             excess = len(files) - 95
-            # 删除所有超过48个的文件
+            # 删除所有超过95个的文件
             for file in files[95:]:
                 os.remove(self.save_path+file)
             # 打印删除了多少个文件
