@@ -86,7 +86,7 @@ def resize_image(imagePath , folder_path , name_pic , current_url , flag):
     return resized_image_path
 
 
-# 调用changeBG函数，传入wallpaper变量作为参数
+# 调用changeBG函数，传入path变量作为参数
 def changewall(image_path , folder_path , name_pic , current_url , flag):
     path = resize_image(image_path , folder_path , name_pic , current_url , flag)
     changeBG(path)
