@@ -6,6 +6,7 @@
 4、文件夹图片最大保存数量为96张，超过之后从最旧的文件开始依次删除，最终保留96张图片
 5、GUI窗口关闭后，程序最小化到托盘运行
 '''
+#增加图片缩放和裁剪处理，更换壁纸设置方式
 
 import os
 import ctypes
@@ -19,11 +20,7 @@ import pystray
 from pystray import MenuItem
 from PIL import Image
 import sys
-import base64
 import auto_wallpaper_V2
-from icon import Icon
-with open('tmp.ico','wb') as tmp:
-    tmp.write(base64.b64decode(Icon().img))
 
 # 设置下载图片的网址
 IMAGE_URLS = {
@@ -57,6 +54,8 @@ class DesktopBackgroundChanger:
         def quit_window(icon: pystray.Icon):
             icon.stop()
             self.window.destroy()
+            # 结束程序
+            sys.exit()
 
         # 定义显示函数，恢复tk窗口
         def show_window():
@@ -68,8 +67,19 @@ class DesktopBackgroundChanger:
             MenuItem('退出', quit_window),
         )
 
+        # 定义附加文件的路径
+        def get_resource_path(relative_path):
+            # 获取附加文件的绝对路径
+            try:
+                # PyInstaller 创建一个临时文件夹并将路径存储在 _MEIPASS 中
+                base_path = sys._MEIPASS
+            except Exception:
+                base_path = os.path.abspath(".")
+
+            return os.path.join(base_path, relative_path)
+
         # 加载图标文件，可以使用自己的图标
-        image = Image.open("tmp.ico")
+        image = Image.open(get_resource_path('tmp.ico'))
 
         # 创建托盘图标对象，设置图标、名称和菜单
         icon = pystray.Icon("icon", image, "实时地球", menu)
@@ -77,8 +87,7 @@ class DesktopBackgroundChanger:
         self.window = tk.Tk()
         self.window.title('实时地球')
         # 定义窗口图标
-        self.window.iconbitmap('tmp.ico')
-        #os.remove('tmp.ico')
+        self.window.iconbitmap(get_resource_path('tmp.ico'))
 
         # 开启一个守护线程来运行托盘图标，防止阻塞tk的事件循环
         threading.Thread(target=icon.run, daemon=True).start()
@@ -202,14 +211,14 @@ class DesktopBackgroundChanger:
         #     oldest_file = min(files, key=lambda x: os.path.getctime(self.save_path+x))
         #     os.remove(self.save_path+oldest_file)
 
-        # 统计文件数量,超过95张之后，从最旧的文件开始依次删除，最终保留96张图片（新的壁纸，在删除多余的旧文件之后才生成，所以文件夹中图片数量为95+1）
+        # 统计文件数量,并删除超过48张的最早保存的图片
         files = os.listdir(self.save_path)
         if len(files) > 95:
             # 对文件名按照创建时间排序，最新的在前面
             files.sort(key=lambda x: os.path.getctime(self.save_path+x), reverse=True)
-            # 计算超过95个的文件数量
+            # 计算超过48个的文件数量
             excess = len(files) - 95
-            # 删除所有超过95个的文件
+            # 删除所有超过48个的文件
             for file in files[95:]:
                 os.remove(self.save_path+file)
             # 打印删除了多少个文件
