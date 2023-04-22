@@ -142,7 +142,7 @@ class DesktopBackgroundChanger:
         self.interval_var = tk.StringVar(value='30')   #默认30 min 拉取一次图片
         interval_entry = ttk.Entry(interval_frame, width=5, textvariable=self.interval_var)
         interval_entry.pack(side=tk.LEFT, padx=(0, 5))
-        interval_unit = ttk.Label(interval_frame, text='min/pcs')
+        interval_unit = ttk.Label(interval_frame, text='分钟/张')
         interval_unit.pack(side=tk.LEFT)
         interval_frame.pack(anchor=tk.W, padx=10, pady=10)
 
