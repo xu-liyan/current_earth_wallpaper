@@ -36,7 +36,11 @@ scale = {
     '更小尺寸': 3 ,
 }
 
+
 class DesktopBackgroundChanger:
+    start_flag = 0
+    start_flag2 = 0
+
     def __init__(self, interval=30*60): #默认30 min 拉取一次图片
         self.interval = interval
         self.timer = None
@@ -50,6 +54,7 @@ class DesktopBackgroundChanger:
 
     def create_gui(self):
         # 实现关闭窗口后，程序隐藏到托盘运行
+
         # 定义退出函数，关闭托盘图标和tk窗口
         def quit_window(icon: pystray.Icon):
             icon.stop()
@@ -67,7 +72,7 @@ class DesktopBackgroundChanger:
             MenuItem('退出', quit_window),
         )
 
-        # 定义附加文件的路径
+        # 定义附加文件的路径 打包成exe时，必须将 “tmp.ico” 添加为附加文件 ！！
         def get_resource_path(relative_path):
             # 获取附加文件的绝对路径
             try:
@@ -84,13 +89,13 @@ class DesktopBackgroundChanger:
         # 创建托盘图标对象，设置图标、名称和菜单
         icon = pystray.Icon("icon", image, "实时地球", menu)
 
+        # 开启一个守护线程来运行托盘图标，防止阻塞tk的事件循环
+        threading.Thread(target=icon.run, daemon=True).start()
+
         self.window = tk.Tk()
         self.window.title('实时地球')
         # 定义窗口图标
         self.window.iconbitmap(get_resource_path('tmp.ico'))
-
-        # 开启一个守护线程来运行托盘图标，防止阻塞tk的事件循环
-        threading.Thread(target=icon.run, daemon=True).start()
 
         # 创建关闭按钮的处理
         self.window.protocol('WM_DELETE_WINDOW', lambda: self.window.withdraw())
@@ -148,6 +153,7 @@ class DesktopBackgroundChanger:
 
         # 开始和退出按钮
         start_button = ttk.Button(self.window, text='开始', command=self.start)
+        #stop_button = ttk.Button(self.window, text='停止', command=self.stop)
         exit_button = ttk.Button(self.window, text='退出', command=exit)
         start_button.pack()
         exit_button.pack()
@@ -225,14 +231,26 @@ class DesktopBackgroundChanger:
             print(f"Deleted {excess} oldest files from {self.save_path}")
 
     def set_desktop_background_and_schedule_next_change(self):
-        self.download_image()
-        self.set_desktop_background()
-        self.timer = threading.Timer(float(self.interval_var.get()) * 60, self.set_desktop_background_and_schedule_next_change)
-        self.timer.start()
+        if DesktopBackgroundChanger.start_flag == 1 :
+            if DesktopBackgroundChanger.start_flag2 > 0 :
+                DesktopBackgroundChanger.start_flag2 = DesktopBackgroundChanger.start_flag2 - 1
+                return
+            self.download_image()
+            self.set_desktop_background()
+            self.timer = threading.Timer(float(self.interval_var.get()) * 60, self.set_desktop_background_and_schedule_next_change)
+            self.timer.start()
+        elif DesktopBackgroundChanger.start_flag == 2 :   
+            DesktopBackgroundChanger.start_flag2 = DesktopBackgroundChanger.start_flag2 + 1
+            DesktopBackgroundChanger.start_flag = 1
+            self.download_image()
+            self.set_desktop_background()
+            self.timer = threading.Timer(float(self.interval_var.get()) * 60, self.set_desktop_background_and_schedule_next_change)
+            self.timer.start()
 
     def start(self):
         if self.save_path:
             # 启动定时器
+            DesktopBackgroundChanger.start_flag = DesktopBackgroundChanger.start_flag + 1
             self.set_desktop_background_and_schedule_next_change()
         else:
             # 如果未选择保存路径，则弹出错误提示框
