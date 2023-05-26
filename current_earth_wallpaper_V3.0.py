@@ -6,7 +6,6 @@
 4、文件夹图片最大保存数量为96张，超过之后从最旧的文件开始依次删除，最终保留96张图片
 5、GUI窗口关闭后，程序最小化到托盘运行
 '''
-#增加图片缩放和裁剪处理，更换壁纸设置方式
 
 import os
 import ctypes
@@ -55,11 +54,11 @@ class DesktopBackgroundChanger:
     def create_gui(self):
         # 实现关闭窗口后，程序隐藏到托盘运行
 
-        # 定义退出函数，关闭托盘图标和tk窗口
-        def quit_window(icon: pystray.Icon):
-            icon.stop()
+        # 定义退出函数：取消定时线程、关闭tk窗口、关闭托盘图标、结束程序
+        def quit_window(icon:pystray.Icon):
+            self.timer.cancel()
             self.window.destroy()
-            # 结束程序
+            icon.stop()
             sys.exit()
 
         # 定义显示函数，恢复tk窗口
@@ -104,10 +103,10 @@ class DesktopBackgroundChanger:
         def exit():
             # 弹出一个确认框，询问用户是否要退出
             if messagebox.askokcancel("退出", "确定要停止程序并退出吗？"):
-                # 如果用户点击确定，就销毁主窗口，并结束程序
+                # 如果用户点击确定：取消定时线程、关闭托盘图标、销毁主窗口、并结束程序
+                self.timer.cancel()
                 icon.stop()
                 self.window.destroy()
-                # 结束程序
                 sys.exit()
 
         # 图像源选项
@@ -153,7 +152,6 @@ class DesktopBackgroundChanger:
 
         # 开始和退出按钮
         start_button = ttk.Button(self.window, text='开始', command=self.start)
-        #stop_button = ttk.Button(self.window, text='停止', command=self.stop)
         exit_button = ttk.Button(self.window, text='退出', command=exit)
         start_button.pack()
         exit_button.pack()
