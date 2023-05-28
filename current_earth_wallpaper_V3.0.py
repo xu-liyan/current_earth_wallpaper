@@ -37,8 +37,9 @@ scale = {
 
 
 class DesktopBackgroundChanger:
-    start_flag = 0
+    start_flag1 = 0
     start_flag2 = 0
+    timers = [] #创建一个空列表来存储定时器对象
 
     def __init__(self, interval=30*60): #默认30 min 拉取一次图片
         self.interval = interval
@@ -54,9 +55,13 @@ class DesktopBackgroundChanger:
     def create_gui(self):
         # 实现关闭窗口后，程序隐藏到托盘运行
 
-        # 定义退出函数：取消定时线程、关闭tk窗口、关闭托盘图标、结束程序
+        # 定义退出函数：取消定时器线程、关闭tk窗口、关闭托盘图标、结束程序
         def quit_window(icon:pystray.Icon):
-            self.timer.cancel()
+            if DesktopBackgroundChanger.start_flag1 > 0 :
+                    print('times = ' , DesktopBackgroundChanger.timers)
+                    # 遍历列表，取消所有正在运行的定时器
+                    for self.timer in DesktopBackgroundChanger.timers:
+                        self.timer.cancel()
             self.window.destroy()
             icon.stop()
             sys.exit()
@@ -103,8 +108,12 @@ class DesktopBackgroundChanger:
         def exit():
             # 弹出一个确认框，询问用户是否要退出
             if messagebox.askokcancel("退出", "确定要停止程序并退出吗？"):
-                # 如果用户点击确定：取消定时线程、关闭托盘图标、销毁主窗口、并结束程序
-                self.timer.cancel()
+                # 如果用户点击确定：取消定时器线程、关闭托盘图标、销毁主窗口、并结束程序
+                if DesktopBackgroundChanger.start_flag1 > 0 :
+                    print('times = ' , DesktopBackgroundChanger.timers)
+                    # 遍历列表，取消所有正在运行的定时器
+                    for self.timer in DesktopBackgroundChanger.timers:
+                        self.timer.cancel()
                 icon.stop()
                 self.window.destroy()
                 sys.exit()
@@ -229,7 +238,13 @@ class DesktopBackgroundChanger:
             print(f"Deleted {excess} oldest files from {self.save_path}")
 
     def set_desktop_background_and_schedule_next_change(self):
-        if DesktopBackgroundChanger.start_flag == 1 :
+        # 遍历列表，检查每个定时器是否还在运行
+        for self.timer in DesktopBackgroundChanger.timers:
+            # 如果定时器已经取消或者到期，就从列表中删除它
+            if not self.timer.is_alive():
+                DesktopBackgroundChanger.timers.remove(self.timer)
+
+        if DesktopBackgroundChanger.start_flag1 == 1 :
             if DesktopBackgroundChanger.start_flag2 > 0 :
                 DesktopBackgroundChanger.start_flag2 = DesktopBackgroundChanger.start_flag2 - 1
                 return
@@ -237,18 +252,21 @@ class DesktopBackgroundChanger:
             self.set_desktop_background()
             self.timer = threading.Timer(float(self.interval_var.get()) * 60, self.set_desktop_background_and_schedule_next_change)
             self.timer.start()
-        elif DesktopBackgroundChanger.start_flag == 2 :   
+            DesktopBackgroundChanger.timers.append(self.timer)  #把定时器对象加入到列表中
+        elif DesktopBackgroundChanger.start_flag1 == 2 :   
             DesktopBackgroundChanger.start_flag2 = DesktopBackgroundChanger.start_flag2 + 1
-            DesktopBackgroundChanger.start_flag = 1
+            DesktopBackgroundChanger.start_flag1 = 1
             self.download_image()
             self.set_desktop_background()
             self.timer = threading.Timer(float(self.interval_var.get()) * 60, self.set_desktop_background_and_schedule_next_change)
             self.timer.start()
+            DesktopBackgroundChanger.timers.append(self.timer)  #把定时器对象加入到列表中
+        
 
     def start(self):
         if self.save_path:
             # 启动定时器
-            DesktopBackgroundChanger.start_flag = DesktopBackgroundChanger.start_flag + 1
+            DesktopBackgroundChanger.start_flag1 = DesktopBackgroundChanger.start_flag1 + 1
             self.set_desktop_background_and_schedule_next_change()
         else:
             # 如果未选择保存路径，则弹出错误提示框
