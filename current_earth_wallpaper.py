@@ -37,8 +37,7 @@ scale = {
 
 
 class DesktopBackgroundChanger:
-    start_flag1 = 0
-    start_flag2 = 0
+    run_times = 0
     timers = [] #创建一个空列表来存储定时器对象
 
     def __init__(self, interval=30*60): #默认30 min 拉取一次图片
@@ -57,11 +56,10 @@ class DesktopBackgroundChanger:
 
         # 定义退出函数：取消定时器线程、关闭tk窗口、关闭托盘图标、结束程序
         def quit_window(icon:pystray.Icon):
-            if DesktopBackgroundChanger.start_flag1 > 0 :
-                    print('times = ' , DesktopBackgroundChanger.timers)
-                    # 遍历列表，取消所有正在运行的定时器
-                    for self.timer in DesktopBackgroundChanger.timers:
-                        self.timer.cancel()
+            print('times = ' , DesktopBackgroundChanger.timers)
+            # 遍历列表，取消所有正在运行的定时器
+            for self.timer in DesktopBackgroundChanger.timers:
+                self.timer.cancel()
             self.window.destroy()
             icon.stop()
             sys.exit()
@@ -109,11 +107,10 @@ class DesktopBackgroundChanger:
             # 弹出一个确认框，询问用户是否要退出
             if messagebox.askokcancel("退出", "确定要停止程序并退出吗？"):
                 # 如果用户点击确定：取消定时器线程、关闭托盘图标、销毁主窗口、并结束程序
-                if DesktopBackgroundChanger.start_flag1 > 0 :
-                    print('times = ' , DesktopBackgroundChanger.timers)
-                    # 遍历列表，取消所有正在运行的定时器
-                    for self.timer in DesktopBackgroundChanger.timers:
-                        self.timer.cancel()
+                print('times = ' , DesktopBackgroundChanger.timers)
+                # 遍历列表，取消所有正在运行的定时器
+                for self.timer in DesktopBackgroundChanger.timers:
+                    self.timer.cancel()
                 icon.stop()
                 self.window.destroy()
                 sys.exit()
@@ -210,13 +207,14 @@ class DesktopBackgroundChanger:
 
     def download_image(self):
         # 下载图片并保存到指定文件夹
-        print('url = ' , self.update_image_url())
-        print('download begin')
+        print('Time: ' , datetime.now().strftime('%Y%m%d_%H%M%S'))
+        print('url: ' , self.update_image_url())
+        print('image download begin')
         response = requests.get(self.current_image_url)
         with open(self.save_path + datetime.now().strftime('%Y%m%d_%H%M%S') + '.jpg', 'wb') as f:
             f.write(response.content)
             #time.sleep(5)
-            print('download end')
+            print('image download end')
 
         # # 统计文件数量并删除最早保存的一张图片
         # files = os.listdir(self.save_path)
@@ -244,29 +242,22 @@ class DesktopBackgroundChanger:
             if not self.timer.is_alive():
                 DesktopBackgroundChanger.timers.remove(self.timer)
 
-        if DesktopBackgroundChanger.start_flag1 == 1 :
-            if DesktopBackgroundChanger.start_flag2 > 0 :
-                DesktopBackgroundChanger.start_flag2 = DesktopBackgroundChanger.start_flag2 - 1
-                return
-            self.download_image()
-            self.set_desktop_background()
-            self.timer = threading.Timer(float(self.interval_var.get()) * 60, self.set_desktop_background_and_schedule_next_change)
-            self.timer.start()
-            DesktopBackgroundChanger.timers.append(self.timer)  #把定时器对象加入到列表中
-        elif DesktopBackgroundChanger.start_flag1 == 2 :   
-            DesktopBackgroundChanger.start_flag2 = DesktopBackgroundChanger.start_flag2 + 1
-            DesktopBackgroundChanger.start_flag1 = 1
-            self.download_image()
-            self.set_desktop_background()
-            self.timer = threading.Timer(float(self.interval_var.get()) * 60, self.set_desktop_background_and_schedule_next_change)
-            self.timer.start()
-            DesktopBackgroundChanger.timers.append(self.timer)  #把定时器对象加入到列表中
+        self.download_image()
+        self.set_desktop_background()
+        DesktopBackgroundChanger.run_times = DesktopBackgroundChanger.run_times + 1
+        print('run_times = ' , DesktopBackgroundChanger.run_times)
+        print(end='\n')
+        self.timer = threading.Timer(float(self.interval_var.get()) * 60, self.set_desktop_background_and_schedule_next_change)
+        self.timer.start()
+        DesktopBackgroundChanger.timers.append(self.timer)  #把定时器对象加入到列表中
         
 
     def start(self):
         if self.save_path:
-            # 启动定时器
-            DesktopBackgroundChanger.start_flag1 = DesktopBackgroundChanger.start_flag1 + 1
+            # 遍历列表，取消所有正在运行的定时器
+            for self.timer in DesktopBackgroundChanger.timers:
+                self.timer.cancel()
+            time.sleep(0.01)
             self.set_desktop_background_and_schedule_next_change()
         else:
             # 如果未选择保存路径，则弹出错误提示框
