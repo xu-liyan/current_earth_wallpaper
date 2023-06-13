@@ -3,14 +3,19 @@
 
 import ctypes
 import PIL
-from PIL import Image, ImageDraw, ImageGrab, ImageOps
-import tempfile
-import os
-import time
+from PIL import Image, ImageDraw, ImageGrab
+import mss
 
 global screen_width, screen_height
-# 获取显示器的分辨率
-screen_width, screen_height = PIL.ImageGrab.grab().size
+# 创建一个mss对象，获取显示器的分辨率
+with mss.mss() as sct:
+    # 获取所有显示器的信息
+    monitors = sct.monitors
+    # 获取第一个显示器的信息
+    monitor = monitors[0]
+    # 获取第一个显示器的宽度和高度
+    screen_width = monitor["width"]
+    screen_height = monitor["height"]
 
 # 定义一个更改壁纸的函数，接受一个图片路径作为参数
 def changeBG(imagePath):
@@ -19,6 +24,7 @@ def changeBG(imagePath):
     # 调用ctypes模块的windll属性，使用SystemParametersInfoW函数更改壁纸
     # 第一个参数是操作码，第二个参数是保留值，第三个参数是图片路径，第四个参数是更新选项
     ctypes.windll.user32.SystemParametersInfoW(SPI_SETDESKWALLPAPER, 0, imagePath, 3)
+    print('Wallpaper set successful')
     # 返回None
     return None
 
@@ -40,6 +46,7 @@ def resize_image(imagePath , folder_path , name_pic , current_url , flag):
     # 第一个参数是新的宽度和高度的元组，第二个参数是缩放算法
     resized_image = image.resize((new_width, new_height), PIL.Image.LANCZOS)
     img = resized_image
+    print('Image resized successful')
 
     # 将图片先裁剪为方形，再裁剪为圆形（如果直接裁剪为圆形，很容易因为图片计算过程过程中四舍五入，导致创建的画布大小和图片大小不匹配而报错
     #将图片裁剪为方形
@@ -57,6 +64,7 @@ def resize_image(imagePath , folder_path , name_pic , current_url , flag):
     draw = ImageDraw.Draw(mask) # 创建一个绘图对象
     draw.ellipse((0, 0, FY4_s, FY4_s), fill=255) # 绘制一个白色的圆形
     img.putalpha(mask) # 将圆形作为透明度掩码
+    print('Image redraw successful')
 
     #设置缩放比
     if flag == 0:
@@ -82,11 +90,12 @@ def resize_image(imagePath , folder_path , name_pic , current_url , flag):
 
     resized_image_path = folder_path + "resize_" + name_pic + ".jpg"
     resized_image.save(resized_image_path)
+    print('Wallpaper generate successful')
     # 返回调整后的图片路径
     return resized_image_path
 
 
-# 调用changeBG函数，传入path变量作为参数
+# 调用changeBG函数，传入wallpaper变量作为参数
 def changewall(image_path , folder_path , name_pic , current_url , flag):
     path = resize_image(image_path , folder_path , name_pic , current_url , flag)
     changeBG(path)
