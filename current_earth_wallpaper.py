@@ -8,7 +8,6 @@
 '''
 
 import os
-import ctypes
 import requests
 import threading
 from datetime import datetime
@@ -19,6 +18,8 @@ import pystray
 from pystray import MenuItem
 from PIL import Image
 import sys
+import pickle
+import winreg
 import auto_wallpaper_V2
 
 # 设置下载图片的网址
@@ -38,7 +39,12 @@ scale = {
 
 class DesktopBackgroundChanger:
     run_times = 0
-    timers = [] #创建一个空列表来存储定时器对象
+    timers = [] # 创建一个空列表来存储定时器对象
+    self_start_flag = 0
+
+    # 获取快捷方式中传入的参数
+    if len(sys.argv) > 1:
+        self_start_flag = int(sys.argv[1])
 
     def __init__(self, interval=30*60): #默认30 min 拉取一次图片
         self.interval = interval
@@ -75,18 +81,32 @@ class DesktopBackgroundChanger:
         )
 
         # 定义附加文件的路径 打包成exe时，必须将 “tmp.ico” 添加为附加文件 ！！
-        def get_resource_path(relative_path):
-            # 获取附加文件的绝对路径
-            try:
-                # PyInstaller 创建一个临时文件夹并将路径存储在 _MEIPASS 中
-                base_path = sys._MEIPASS
-            except Exception:
-                base_path = os.path.abspath(".")
-
-            return os.path.join(base_path, relative_path)
+        # def get_resource_path(relative_path):
+        #     # 获取附加文件的绝对路径
+        #     try:
+        #         # PyInstaller 创建一个临时文件夹并将路径存储在 _MEIPASS 中
+        #         # sys._MEIPASS是在使用pyinstaller打包exe文件时添加的一个属性，它指向exe文件解压后的临时文件夹
+        #         base_path = sys._MEIPASS
+        #     except Exception:
+        #         base_path = os.path.abspath(".")
+        #     return os.path.join(base_path, relative_path)
+        
+        # 定义app_path()函数，返回exe文件的运行路径
+        def app_path():
+            if hasattr(sys, 'frozen'):  # frozen属性是在使用pyinstaller打包exe文件时添加的，表示程序是被打包过的
+                # os.path.dirname()用于获取一个文件路径的目录部分
+                # sys.executable是一个变量，表示当前运行的程序文件的完整路径；在没有打包的情况下，它指向Python解释器
+                # 在打包后的情况下，它指向exe文件本身。所以，如果你想加载和exe文件同一目录下的资源文件，你可以使用sys.executable来获取它们的绝对路径。
+                return os.path.dirname(sys.executable)
+            else:
+                return os.path.dirname(__file__) # 没打包，就返回当前运行的py文件的完整路径
+        
+        #time.sleep(5)
 
         # 加载图标文件，可以使用自己的图标
-        image = Image.open(get_resource_path('tmp.ico'))
+        # image = Image.open(get_resource_path('tmp.ico'))
+        image = Image.open(os.path.join(app_path(), 'tmp.ico'))
+        # image = Image.open('tmp.ico')
 
         # 创建托盘图标对象，设置图标、名称和菜单
         icon = pystray.Icon("icon", image, "实时地球", menu)
@@ -97,23 +117,11 @@ class DesktopBackgroundChanger:
         self.window = tk.Tk()
         self.window.title('实时地球')
         # 定义窗口图标
-        self.window.iconbitmap(get_resource_path('tmp.ico'))
-
+        # self.window.iconbitmap(get_resource_path('tmp.ico'))
+        self.window.iconbitmap(os.path.join(app_path(), 'tmp.ico'))
+        # self.window.iconbitmap('tmp.ico')
         # 创建关闭按钮的处理
         self.window.protocol('WM_DELETE_WINDOW', lambda: self.window.withdraw())
-
-        # 定义一个函数，用于停止程序，并关闭gui界面
-        def exit():
-            # 弹出一个确认框，询问用户是否要退出
-            if messagebox.askokcancel("退出", "确定要停止程序并退出吗？"):
-                # 如果用户点击确定：取消定时器线程、关闭托盘图标、销毁主窗口、并结束程序
-                print('times = ' , DesktopBackgroundChanger.timers)
-                # 遍历列表，取消所有正在运行的定时器
-                for self.timer in DesktopBackgroundChanger.timers:
-                    self.timer.cancel()
-                icon.stop()
-                self.window.destroy()
-                sys.exit()
 
         # 图像源选项
         source_frame = ttk.LabelFrame(self.window, text='选择图像源：')
@@ -137,13 +145,13 @@ class DesktopBackgroundChanger:
         folder_frame = ttk.Frame(self.window)
         folder_label = ttk.Label(folder_frame, text='选择图像保存位置：')
         folder_label.pack(side=tk.LEFT)
-        folder_entry = ttk.Entry(folder_frame, state='readonly')
+        self.save_path_var = tk.StringVar()
+        folder_entry = ttk.Entry(folder_frame, textvariable=self.save_path_var, state='readonly')
         folder_entry.pack(side=tk.LEFT, fill=tk.X, expand=True)
-        folder_entry.insert(0, 'Select folder')
+        #folder_entry.insert(0, 'Select folder')
         folder_button = ttk.Button(folder_frame, text='浏览', command=lambda: self.set_save_path(folder_entry))
         folder_button.pack(side=tk.RIGHT)
         folder_frame.pack(fill=tk.X, padx=10, pady=10)
-        self.save_path_var = folder_entry
 
         # 时间间隔设置
         interval_frame = ttk.Frame(self.window)
@@ -156,13 +164,141 @@ class DesktopBackgroundChanger:
         interval_unit.pack(side=tk.LEFT)
         interval_frame.pack(anchor=tk.W, padx=10, pady=10)
 
-        # 开始和退出按钮
-        start_button = ttk.Button(self.window, text='开始', command=self.start)
+        # 创建一个函数，用于保存输入框中的内容到一个文件中
+        def save():
+            # 创建一个字典，存放输入框中的内容
+            data = {
+                "current_url": self.current_url_var.get(),
+                "current_scale": self.current_scale_var.get(),
+                "save_path": self.save_path_var.get(),
+                "interval_var": self.interval_var.get()
+            }
+            # 打开一个文件，用二进制写入模式
+            with open(os.path.join(app_path(), "wallpaperdata.pkl"), "wb") as f:
+                # 用pickle模块将字典保存到文件中
+                pickle.dump(data, f)
+
+        # 创建一个函数，用于从一个文件中读取输入框中的内容
+        def load():
+            # 打开一个文件，用二进制读取模式
+            with open(os.path.join(app_path(), "wallpaperdata.pkl"), "rb") as f:
+                # 用pickle模块将文件中的内容加载为一个字典
+                data = pickle.load(f)
+            # 将字典中的内容设置到输入框中
+            self.current_url_var.set(data["current_url"])
+            self.current_scale_var.set(data["current_scale"])
+            self.save_path_var.set(data["save_path"])
+            self.interval_var.set(data["interval_var"])
+
+        # 定义一个函数，读取开机自启动状态
+        def read_auto_start():
+            # 获取当前程序的路径和文件名
+            exe_path = os.path.abspath(sys.argv[0])
+            exe_name = os.path.basename(exe_path)
+            # 获取注册表中的Run键
+            key = winreg.OpenKey(winreg.HKEY_CURRENT_USER, r'Software\Microsoft\Windows\CurrentVersion\Run', 0, winreg.KEY_ALL_ACCESS)
+            try:
+                # 尝试读取当前程序的值，如果存在，说明已经设置了开机自启
+                value, _ = winreg.QueryValueEx(key, exe_name)
+                auto_start_flag = '取消开机自启'
+            except FileNotFoundError:
+                # 如果不存在，说明没有设置开机自启
+                auto_start_flag = '设为开机自启'
+            return auto_start_flag
+        
+        # 定义一个函数，用于设置开机自启动
+        def set_auto_start():
+            # 获取当前程序的路径和文件名
+            exe_path = os.path.abspath(sys.argv[0])
+            exe_name = os.path.basename(exe_path)
+            # 获取注册表中的Run键
+            key = winreg.OpenKey(winreg.HKEY_CURRENT_USER, r'Software\Microsoft\Windows\CurrentVersion\Run', 0, winreg.KEY_ALL_ACCESS)
+            try:
+                # 尝试读取当前程序的值，如果存在，说明已经设置了开机自启动
+                value, _ = winreg.QueryValueEx(key, exe_name)
+                # 删除当前程序的值，取消开机自启动
+                winreg.DeleteValue(key, exe_name)
+                # 在按钮上显示设置开机自启动
+                button_auto_start.config(text="设为开机自启")
+            except FileNotFoundError:
+                # 如果不存在，说明没有设置开机自启动
+                # 写入当前程序的值，设置开机自启动，并传入1作为参数
+                value = f'"{exe_path}" {1}'
+                winreg.SetValueEx(key, exe_name, 0, winreg.REG_SZ, value)
+                # 在按钮上显示取消开机自启动
+                button_auto_start.config(text="取消开机自启")
+            finally:
+                # 关闭注册表键
+                winreg.CloseKey(key)
+
+        # 定义一个函数，用于开始程序
+        def start():
+            if self.save_path_var.get() != "" :
+                # 遍历列表，取消所有正在运行的定时器
+                for self.timer in DesktopBackgroundChanger.timers:
+                    self.timer.cancel()
+                time.sleep(0.01)
+                self.set_desktop_background_and_schedule_next_change()
+            else:
+                # 如果未选择保存路径，则弹出错误提示框
+                error_box = tk.Toplevel(self.window)
+                error_box.title('Error')
+                error_label = ttk.Label(error_box, text='请选择一个文件夹，以保存壁纸 ！')
+                error_label.pack()
+                ok_button = ttk.Button(error_box, text='确定', command=error_box.destroy)
+                ok_button.pack()
+
+        # 定义一个函数，用于停止程序，并关闭gui界面
+        def exit():
+            # 弹出一个确认框，询问用户是否要退出
+            if messagebox.askokcancel("退出", "确定要停止程序并退出吗？"):
+                # 如果用户点击确定：保存输入框中的内容、取消定时器线程、关闭托盘图标、销毁主窗口、并结束程序
+                save()
+                # 遍历列表，取消所有正在运行的定时器
+                print('times = ' , DesktopBackgroundChanger.timers)
+                for self.timer in DesktopBackgroundChanger.timers:
+                    self.timer.cancel()
+                icon.stop()
+                self.window.destroy()
+                print('exit successful')
+                sys.exit()
+        
+        # 定义一个函数，实现窗口居中
+        def center_window(window):
+            # 更新窗口的状态
+            window.update_idletasks()
+            # 获取窗口的宽度和高度
+            window_width = window.winfo_width()
+            window_height = window.winfo_height()
+            # 获取屏幕的宽度和高度
+            screen_width = window.winfo_screenwidth()
+            screen_height = window.winfo_screenheight()
+            # 计算居中的位置
+            x = (screen_width - window_width) // 2
+            y = (screen_height - window_height) // 2
+            # 设置窗口的位置
+            window.geometry(f'{window_width}x{window_height}+{x}+{y}')
+
+        # 开始、退出、开机自启动按钮
+        auto_start_flag = read_auto_start()
+        start_button = ttk.Button(self.window, text='开始', command=start)
         exit_button = ttk.Button(self.window, text='退出', command=exit)
+        button_auto_start = ttk.Button(self.window, text=auto_start_flag, command=set_auto_start)
         start_button.pack()
         exit_button.pack()
+        button_auto_start.pack(side='bottom', anchor='e')
 
+        load() # 加载默认配置
+        self.save_path = self.save_path_var.get()
+        # 如果快捷方式中传入的参数为 1 ，自动开始主进程
+        if DesktopBackgroundChanger.self_start_flag == 1 :
+            self.window.after(1000, start)   # 1000毫秒后调用该函数，可以解决打开程序时窗口严重卡顿问题
+
+        # 调用窗口居中函数
+        center_window(self.window)
+    
         self.window.mainloop()
+
 
     def update_image_url(self):
         self.current_image_url = self.image_urls[self.current_url_var.get()]
@@ -251,22 +387,6 @@ class DesktopBackgroundChanger:
         self.timer.start()
         DesktopBackgroundChanger.timers.append(self.timer)  #把定时器对象加入到列表中
         
-
-    def start(self):
-        if self.save_path:
-            # 遍历列表，取消所有正在运行的定时器
-            for self.timer in DesktopBackgroundChanger.timers:
-                self.timer.cancel()
-            time.sleep(0.01)
-            self.set_desktop_background_and_schedule_next_change()
-        else:
-            # 如果未选择保存路径，则弹出错误提示框
-            error_box = tk.Toplevel(self.window)
-            error_box.title('Error')
-            error_label = ttk.Label(error_box, text='请选择一个文件夹，以保存壁纸 ！')
-            error_label.pack()
-            ok_button = ttk.Button(error_box, text='确定', command=error_box.destroy)
-            ok_button.pack()
 
 
 # T1 = time.perf_counter()  
