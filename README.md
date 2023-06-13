@@ -3,7 +3,7 @@
 
 软件的的GUI窗口，见下图：
 
-![Snipaste_2023-06-13_12-31-32](https://github.com/xu-liyan/current_earth_wallpaper/assets/43141587/698bbc76-07f4-4f16-bb6f-34f71d7cd77c)
+![Snipaste_2023-06-13_12-42-36](https://github.com/xu-liyan/current_earth_wallpaper/assets/43141587/28082493-6670-41d5-a0ac-75bccb0401bc)
 
 ## 功能
 **1. 选择图像源**
