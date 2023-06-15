@@ -3,10 +3,11 @@
 
 import ctypes
 import PIL
-from PIL import Image, ImageDraw, ImageGrab
+from PIL import Image, ImageDraw, ImageFont, ImageGrab
 import mss
+import datetime
 
-global screen_width, screen_height
+global screen_width, screen_height, watermark_x, watermark_y, watermark_font
 # 创建一个mss对象，获取显示器的分辨率
 with mss.mss() as sct:
     # 获取所有显示器的信息
@@ -16,6 +17,15 @@ with mss.mss() as sct:
     # 获取第一个显示器的宽度和高度
     screen_width = monitor["width"]
     screen_height = monitor["height"]
+
+# 计算时间水印位置坐标
+watermark_font = PIL.ImageFont.truetype("arial.ttf", int(screen_height / 60)) # 根据屏幕高度设置字体大小
+text = datetime.datetime.now().strftime("%Y/%m/%d  %H:%M:%S") # 获取当前时间
+text_width, text_height = watermark_font.getsize(text) # 获取文字的宽度和高度
+margin = int(screen_height / 24) # 设置边距
+watermark_x = screen_width - text_width - margin/2 # 计算文字的横坐标
+watermark_y = screen_height - text_height - margin # 计算文字的纵坐标
+
 
 # 定义一个更改壁纸的函数，接受一个图片路径作为参数
 def changeBG(imagePath):
@@ -30,7 +40,7 @@ def changeBG(imagePath):
 
 
 # 定义一个处理图片的函数，接受一个图片路径作为参数
-def resize_image(imagePath , folder_path , name_pic , current_url , flag):
+def resize_image(imagePath , folder_path , name_pic , current_url , flag , watermark_flag):
     # 使用PIL模块的Image类打开图片
     image = PIL.Image.open(imagePath)
     # 获取图片的原始宽度和高度
@@ -88,6 +98,13 @@ def resize_image(imagePath , folder_path , name_pic , current_url , flag):
     bk_image.paste(resized_image, (int((sw - ew) / 2), int((sh - eh) / 2)), mask = resized_image)
     resized_image = bk_image
 
+
+    # 添加时间水印
+    if watermark_flag == 1:
+        watermark_text = datetime.datetime.now().strftime("%Y/%m/%d  %H:%M:%S") # 获取当前时间
+        draw = ImageDraw.Draw(resized_image) # 创建一个绘图对象
+        draw.text((watermark_x, watermark_y), watermark_text, "white", watermark_font) # 用绘图对象绘制文字
+
     resized_image_path = folder_path + "resize_" + name_pic + ".jpg"
     resized_image.save(resized_image_path)
     print('Wallpaper generate successful')
@@ -96,6 +113,6 @@ def resize_image(imagePath , folder_path , name_pic , current_url , flag):
 
 
 # 调用changeBG函数，传入wallpaper变量作为参数
-def changewall(image_path , folder_path , name_pic , current_url , flag):
-    path = resize_image(image_path , folder_path , name_pic , current_url , flag)
+def changewall(image_path , folder_path , name_pic , current_url , flag , watermark_flag):
+    path = resize_image(image_path , folder_path , name_pic , current_url , flag , watermark_flag)
     changeBG(path)
