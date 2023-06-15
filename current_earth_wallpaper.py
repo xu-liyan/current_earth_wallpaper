@@ -41,6 +41,8 @@ class DesktopBackgroundChanger:
     run_times = 0
     timers = [] # 创建一个空列表来存储定时器对象
     self_start_flag = 0
+    watermark_flag = 0
+    water_time = 1
 
     # 获取快捷方式中传入的参数
     if len(sys.argv) > 1:
@@ -171,7 +173,8 @@ class DesktopBackgroundChanger:
                 "current_url": self.current_url_var.get(),
                 "current_scale": self.current_scale_var.get(),
                 "save_path": self.save_path_var.get(),
-                "interval_var": self.interval_var.get()
+                "interval_var": self.interval_var.get(),
+                "water_button": water_button.cget("text")
             }
             # 打开一个文件，用二进制写入模式
             with open(os.path.join(app_path(), "wallpaperdata.pkl"), "wb") as f:
@@ -189,6 +192,7 @@ class DesktopBackgroundChanger:
             self.current_scale_var.set(data["current_scale"])
             self.save_path_var.set(data["save_path"])
             self.interval_var.set(data["interval_var"])
+            water_button.config(text=data["water_button"])
 
         # 定义一个函数，读取开机自启动状态
         def read_auto_start():
@@ -230,6 +234,21 @@ class DesktopBackgroundChanger:
             finally:
                 # 关闭注册表键
                 winreg.CloseKey(key)
+
+        def watermark():
+            text = water_button.cget("text")
+            if DesktopBackgroundChanger.water_time == 1:
+                if text == "添加时间水印" :
+                    DesktopBackgroundChanger.watermark_flag = 0
+                else:
+                    DesktopBackgroundChanger.watermark_flag = 1
+            else:
+                if text == "添加时间水印" :
+                    DesktopBackgroundChanger.watermark_flag = 1
+                    water_button.config(text="取消时间水印")
+                else:
+                    DesktopBackgroundChanger.watermark_flag = 0
+                    water_button.config(text="添加时间水印")
 
         # 定义一个函数，用于开始程序
         def start():
@@ -279,16 +298,21 @@ class DesktopBackgroundChanger:
             # 设置窗口的位置
             window.geometry(f'{window_width}x{window_height}+{x}+{y}')
 
-        # 开始、退出、开机自启动按钮
+
+        # 开始、退出、时间水印、开机自启动按钮
         auto_start_flag = read_auto_start()
         start_button = ttk.Button(self.window, text='开始', command=start)
         exit_button = ttk.Button(self.window, text='退出', command=exit)
         button_auto_start = ttk.Button(self.window, text=auto_start_flag, command=set_auto_start)
+        water_button = ttk.Button(self.window, text="时间水印", command=watermark)
         start_button.pack()
         exit_button.pack()
-        button_auto_start.pack(side='bottom', anchor='e')
+        button_auto_start.pack(side='right', anchor='e')
+        water_button.pack(side='left', anchor='w')
 
         load() # 加载默认配置
+        watermark()
+        DesktopBackgroundChanger.water_time = 0
         self.save_path = self.save_path_var.get()
         # 如果快捷方式中传入的参数为 1 ，自动开始主进程
         if DesktopBackgroundChanger.self_start_flag == 1 :
@@ -338,7 +362,8 @@ class DesktopBackgroundChanger:
         name_pic = latest_file_name_without_extension
         current_url = self.update_image_url()
         flag = self.scale_flag()
-        auto_wallpaper_V2.changewall(latest_file_path , folder_path , name_pic , current_url , flag)
+        watermark_flag = DesktopBackgroundChanger.watermark_flag
+        auto_wallpaper_V2.changewall(latest_file_path , folder_path , name_pic , current_url , flag , watermark_flag)
         
 
     def download_image(self):
@@ -349,7 +374,6 @@ class DesktopBackgroundChanger:
         response = requests.get(self.current_image_url)
         with open(self.save_path + datetime.now().strftime('%Y%m%d_%H%M%S') + '.jpg', 'wb') as f:
             f.write(response.content)
-            #time.sleep(5)
             print('image download end')
 
         # # 统计文件数量并删除最早保存的一张图片
