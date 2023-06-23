@@ -1,39 +1,40 @@
-Real-time satellite cloud map wallpaper of the Earth
-Get the real-time satellite cloud map of “Fengyun 4A” or “Fengyun 4B”, redraw the image, and generate desktop wallpaper according to the current screen resolution
+# Real-time satellite cloud map wallpaper of the Earth
+**Get the real-time satellite cloud map of "Fengyun 4A" or "Fengyun 4B", redraw the image, and generate desktop wallpaper according to the current screen resolution**
 
 The GUI window of the software is shown in the figure below:
 
-<div align=center><img src=“https://github.com/xu-liyan/current_earth_wallpaper/assets/43141587/1f664126-1000-494f-8de5-3eb43f5f87c1”></div>
+<div align=center><img src="https://github.com/xu-liyan/current_earth_wallpaper/assets/43141587/1f664126-1000-494f-8de5-3eb43f5f87c1"></div>
 
-Features
-1. Select image source
+## Features
+**1. Select image source**
+* You can choose **"Fengyun 4A"** or **"Fengyun 4B"** as the image source
+* In the cloud map of Fengyun 4A, the mainland China area is located above the image, the satellite cloud map resolution is not very high, and the overall color tone is reddish
+* In the cloud map of Fengyun 4B, the mainland China area is located in the upper left corner of the image, the satellite cloud map resolution is relatively high, and the overall color tone is better than Fengyun 4A
+* The size of Fengyun 4A satellite cloud map does not exceed ***1MB***, and the size of Fengyun 4B satellite cloud map can reach up to ***20MB***. Choose the appropriate image source according to your own network environment
 
-You can choose “Fengyun 4A” or “Fengyun 4B” as the image source
-In the cloud map of Fengyun 4A, the mainland China area is located above the image, the satellite cloud map resolution is not very high, and the overall color tone is reddish
-In the cloud map of Fengyun 4B, the mainland China area is located in the upper left corner of the image, the satellite cloud map resolution is relatively high, and the overall color tone is better than Fengyun 4A
-The size of Fengyun 4A satellite cloud map does not exceed 1MB, and the size of Fengyun 4B satellite cloud map can reach up to 20MB. Choose the appropriate image source according to your own network environment
-2. Choose wallpaper ratio
+**2. Choose wallpaper ratio**
+* **Fill screen:** The original image is scaled to the screen resolution, cropped and adjusted to the screen height
+* **Original size:** The original image is scaled to the screen resolution, cropped and kept at 'original size'
+* **Golden ratio:** The original image is scaled to the screen resolution, cropped and kept at a fixed aspect ratio, with a height adjusted to '0.618 times' of the screen height
+* **Smaller size:** The original image is scaled to the screen resolution, cropped and kept at a fixed aspect ratio, with a height adjusted to '0.45 times' of the screen height
 
-Fill screen: The original image is scaled to the screen resolution, cropped and adjusted to the screen height
-Original size: The original image is scaled to the screen resolution, cropped and kept at ‘original size’
-Golden ratio: The original image is scaled to the screen resolution, cropped and kept at a fixed aspect ratio, with a height adjusted to ‘0.618 times’ of the screen height
-Smaller size: The original image is scaled to the screen resolution, cropped and kept at a fixed aspect ratio, with a height adjusted to ‘0.45 times’ of the screen height
-3. Select image save location
+**3. Select image save location**
+* The original image and the generated wallpaper image will be saved in this folder
+* The maximum number of images saved in the folder is 96. After that, the oldest files will be deleted one by one, leaving 96 images
 
-The original image and the generated wallpaper image will be saved in this folder
-The maximum number of images saved in the folder is 96. After that, the oldest files will be deleted one by one, leaving 96 images
-4. Image acquisition frequency
+**4. Image acquisition frequency**
+* Each time an image is acquired, the wallpaper is also updated, in minutes
+* The official update frequency of Fengyun 4A satellite image is 60 minutes. If the image source is "FY4A", it is recommended that the image acquisition frequency be ≥60 minutes
+* The official update frequency of Fengyun 4B satellite image is 15 minutes. If the image source is "FY4B", it is recommended that the image acquisition frequency be ≥15 minutes
 
-Each time an image is acquired, the wallpaper is also updated, in minutes
-The official update frequency of Fengyun 4A satellite image is 60 minutes. If the image source is “FY4A”, it is recommended that the image acquisition frequency be ≥60 minutes
-The official update frequency of Fengyun 4B satellite image is 15 minutes. If the image source is “FY4B”, it is recommended that the image acquisition frequency be ≥15 minutes
-Tips
-Click on the “Start” button and the program will automatically change wallpapers according to the set parameters and frequency
-Click on the “Exit” button and a confirmation window will pop up. Click “OK” to exit completely
-Click on the “Add/Cancel Time Watermark” button in the lower left corner and a time watermark will be added/cancelled in the lower right corner of the wallpaper for easy viewing of satellite cloud map update time
-Click on the “Set/Cancel Startup” button in the lower right corner and the program will automatically open and start updating wallpapers when system starts up without having to manually click “Start”. To cancel, click this button again
-Close program GUI window and program will continue running in background by default. You can see program icon in status bar tray area. Click on program icon in tray to restore GUI window. Right-click on icon will pop up menu where you can choose to show window or exit completely
-Acknowledgements
-The core framework and GUI interface code for this project was generated by ChatGPT (ChatGPT is indeed powerful, but there are also many problems with its generated code, so please use it carefully)
-The idea for this project came from wenkechen’s project MineEarth. I used this program a few years ago, but there were some problems with it. The author has not updated it for a long time and only has “Himawari 8” as an image source. I personally wanted to have the Fengyun satellite image, so I created this project with the help of ChatGPT
-Some of the image processing code was referenced from Jiale685’s project
+## Tips
+* Click on the "Start" button and the program will automatically change wallpapers according to the set parameters and frequency
+* Click on the "Exit" button and a confirmation window will pop up. Click "OK" to exit completely
+* Click on the "Add/Cancel Time Watermark" button in the lower left corner and a time watermark will be added/cancelled in the lower right corner of the wallpaper for easy viewing of satellite cloud map update time
+* Click on the "Set/Cancel Startup" button in the lower right corner and the program will automatically open and start updating wallpapers when system starts up without having to manually click "Start". To cancel, click this button again
+* Close program GUI window and program will continue running in background by default. You can see program icon in status bar tray area. Click on program icon in tray to restore GUI window. Right-click on icon will pop up menu where you can choose to show window or exit completely
+
+# Acknowledgements
+* The core framework and GUI interface code for this project was generated by [**ChatGPT**](https://chat.openai.com/chat) (ChatGPT is indeed powerful, but there are also many problems with its generated code, so please use it carefully)
+* The idea for this project came from [**wenkechen**](https://github.com/wenkechen)'s project [**MineEarth**](https://github.com/wenkechen/MineEarth). I used this program a few years ago, but there were some problems with it. The author has not updated it for a long time and only has "Himawari 8" as an image source. I personally wanted to have the Fengyun satellite image, so I created this project with the help of ChatGPT
+* Some of the image processing code was referenced from [**Jiale685**](https://blog.csdn.net/L141210113/article/details/102642277?spm=1001.2014.3001.5506)'s project
