@@ -1,4 +1,6 @@
 # Real-time satellite cloud map wallpaper of the Earth
+[**简体中文**](https://github.com/xu-liyan/current_earth_wallpaper/blob/main/README.md) | [**English**](https://github.com/xu-liyan/current_earth_wallpaper/blob/main/README_EN.md)
+
 **Get the real-time satellite cloud map of "Fengyun 4A" or "Fengyun 4B", redraw the image, and generate desktop wallpaper according to the current screen resolution**
 
 The GUI window of the software is shown in the figure below:
