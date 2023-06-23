@@ -1,5 +1,6 @@
 # 地球实时卫星云图壁纸
 [**简体中文**](https://github.com/xu-liyan/current_earth_wallpaper/edit/main/README.md) | [**English**](https://github.com/xu-liyan/current_earth_wallpaper/edit/main/README_EN.md)
+
 **获取"风云4A"或“风云4B”的实时卫星云图，重绘图片，根据当前屏幕分辨率，生成桌面壁纸**
 
 软件的的GUI窗口，见下图：
