@@ -5,7 +5,8 @@
 
 软件的的GUI窗口，见下图：
 
-<div align=center><img src="https://github.com/xu-liyan/current_earth_wallpaper/assets/43141587/1f664126-1000-494f-8de5-3eb43f5f87c1"></div>
+<div align=center><img src="https://github.com/xu-liyan/current_earth_wallpaper/assets/43141587/c32ce7e7-49ec-44a3-b253-f652e4a35aec"></div>
+
 
 ## 功能
 **1. 选择图像源**
