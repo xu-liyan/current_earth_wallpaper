@@ -20,6 +20,9 @@ from PIL import Image
 import sys
 import pickle
 import winreg
+import io
+import tkinter.scrolledtext as st
+import _tkinter
 import auto_wallpaper_V2
 
 # 设置下载图片的网址
@@ -103,7 +106,6 @@ class DesktopBackgroundChanger:
             else:
                 return os.path.dirname(__file__) # 没打包，就返回当前运行的py文件的完整路径
         
-        #time.sleep(5)
 
         # 加载图标文件，可以使用自己的图标
         # image = Image.open(get_resource_path('tmp.ico'))
@@ -131,18 +133,18 @@ class DesktopBackgroundChanger:
         self.current_url_var = tk.StringVar(value='FY4A')
         for url_key in self.image_urls.keys():
             ttk.Radiobutton(source_frame, text=url_key, value=url_key, variable=self.current_url_var, command=self.update_image_url).pack(anchor=tk.W)
-
+            
         source_frame.pack(fill=tk.X, padx=10, pady=10)
-
+        
         # 壁纸缩放比例选项
         scale_frame = ttk.LabelFrame(self.window, text='选择壁纸比例：')
 
         self.current_scale_var = tk.StringVar(value='黄金比例')
         for scale_key in self.scale.keys():
             ttk.Radiobutton(scale_frame, text=scale_key, value=scale_key, variable=self.current_scale_var, command=self.scale_flag).pack(anchor=tk.W)
-
+            
         scale_frame.pack(fill=tk.X, padx=10, pady=10)
-
+        
         # 文件夹选择器
         folder_frame = ttk.Frame(self.window)
         folder_label = ttk.Label(folder_frame, text='选择图像保存位置：')
@@ -150,7 +152,7 @@ class DesktopBackgroundChanger:
         self.save_path_var = tk.StringVar()
         folder_entry = ttk.Entry(folder_frame, textvariable=self.save_path_var, state='readonly')
         folder_entry.pack(side=tk.LEFT, fill=tk.X, expand=True)
-        #folder_entry.insert(0, 'Select folder')
+        folder_entry.insert(0, 'Select folder')
         folder_button = ttk.Button(folder_frame, text='浏览', command=lambda: self.set_save_path(folder_entry))
         folder_button.pack(side=tk.RIGHT)
         folder_frame.pack(fill=tk.X, padx=10, pady=10)
@@ -307,8 +309,22 @@ class DesktopBackgroundChanger:
         water_button = ttk.Button(self.window, text="时间水印", command=watermark)
         start_button.pack()
         exit_button.pack()
-        button_auto_start.pack(side='right', anchor='e')
-        water_button.pack(side='left', anchor='w')
+        water_button.pack()
+        button_auto_start.pack()
+
+        # 在主界面的右侧创建一个日志显示界面
+        log_frame = ttk.LabelFrame(self.window, text='运行日志：')
+        # 创建一个带有垂直滚动条的文本控件
+        log_text = st.ScrolledText(log_frame, width=40, height=20)
+        # 布置文本控件
+        log_text.pack(fill="both", expand="yes")
+        # 创建一个 TextRedirector 的实例，传入 log_text 作为参数
+        redirector = TextRedirector(log_text)
+        # 将 sys.stdout 和 sys.stderr 重定向到 redirector
+        sys.stdout = redirector
+        sys.stderr = redirector
+        # 布置日志框架
+        log_frame.pack(side=tk.TOP, fill="both", expand="yes")
 
         load() # 加载默认配置
         watermark()
@@ -411,6 +427,30 @@ class DesktopBackgroundChanger:
         self.timer.start()
         DesktopBackgroundChanger.timers.append(self.timer)  #把定时器对象加入到列表中
         
+class TextRedirector(io.TextIOBase):
+    # 初始化方法，接收一个文本控件作为参数
+    def __init__(self, text_widget):
+        # 调用父类的初始化方法
+        super().__init__()
+        # 保存文本控件的引用
+        self.text_widget = text_widget
+
+    # 重写 write 方法，接收一个字符串作为参数
+    def write(self, s):
+        # 尝试将字符串插入到文本控件的末尾
+        try:
+            self.text_widget.insert(tk.END, s)
+            # 更新文本控件
+            self.text_widget.update()
+            # 将字符串追加到日志文件中
+            with open("log.txt", "a") as f:
+                f.write(s)
+            # 返回字符串的长度
+            return len(s)
+        # 如果发生 TclError 异常，打印错误信息并返回 0
+        except _tkinter.TclError as e:
+            # print(e)
+            return 0
 
 
 # T1 = time.perf_counter()  
