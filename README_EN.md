@@ -5,7 +5,7 @@
 
 The GUI window of the software is shown in the figure below:
 
-<div align=center><img src="https://github.com/xu-liyan/current_earth_wallpaper/assets/43141587/1f664126-1000-494f-8de5-3eb43f5f87c1"></div>
+<div align=center><img src="https://github.com/xu-liyan/current_earth_wallpaper/assets/43141587/c32ce7e7-49ec-44a3-b253-f652e4a35aec"></div>
 
 ## Features
 **1. Select image source**
@@ -32,8 +32,9 @@ The GUI window of the software is shown in the figure below:
 ## Tips
 * Click on the "Start" button and the program will automatically change wallpapers according to the set parameters and frequency
 * Click on the "Exit" button and a confirmation window will pop up. Click "OK" to exit completely
-* Click on the "Add/Cancel Time Watermark" button in the lower left corner and a time watermark will be added/cancelled in the lower right corner of the wallpaper for easy viewing of satellite cloud map update time
-* Click on the "Set/Cancel Startup" button in the lower right corner and the program will automatically open and start updating wallpapers when system starts up without having to manually click "Start". To cancel, click this button again
+* Click on the “Add/Cancel Time Watermark” button and a time watermark will be added/cancelled in the lower right corner of the wallpaper for easy viewing of satellite cloud map update time
+* Click on the “Set/Cancel Startup” button and the program will automatically open and start updating wallpapers when system starts up without having to manually click “Start”. To cancel, click this button again
+* The bottom of the main interface is the “Run Log” display box, which can feedback the program running status
 * Close program GUI window and program will continue running in background by default. You can see program icon in status bar tray area. Click on program icon in tray to restore GUI window. Right-click on icon will pop up menu where you can choose to show window or exit completely
 
 # Acknowledgements
