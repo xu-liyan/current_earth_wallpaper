@@ -39,6 +39,15 @@ scale = {
     '更小尺寸': 3 ,
 }
 
+# 定义app_path()函数，返回exe文件的运行路径
+def app_path():
+    if hasattr(sys, 'frozen'):  # frozen属性是在使用pyinstaller打包exe文件时添加的，表示程序是被打包过的
+        # os.path.dirname()用于获取一个文件路径的目录部分
+        # sys.executable是一个变量，表示当前运行的程序文件的完整路径；在没有打包的情况下，它指向Python解释器
+        # 在打包后的情况下，它指向exe文件本身。所以，如果你想加载和exe文件同一目录下的资源文件，你可以使用sys.executable来获取它们的绝对路径。
+        return os.path.dirname(sys.executable)
+    else:
+        return os.path.dirname(__file__) # 没打包，就返回当前运行的py文件的完整路径
 
 class DesktopBackgroundChanger:
     run_times = 0
@@ -95,18 +104,8 @@ class DesktopBackgroundChanger:
         #     except Exception:
         #         base_path = os.path.abspath(".")
         #     return os.path.join(base_path, relative_path)
-        
-        # 定义app_path()函数，返回exe文件的运行路径
-        def app_path():
-            if hasattr(sys, 'frozen'):  # frozen属性是在使用pyinstaller打包exe文件时添加的，表示程序是被打包过的
-                # os.path.dirname()用于获取一个文件路径的目录部分
-                # sys.executable是一个变量，表示当前运行的程序文件的完整路径；在没有打包的情况下，它指向Python解释器
-                # 在打包后的情况下，它指向exe文件本身。所以，如果你想加载和exe文件同一目录下的资源文件，你可以使用sys.executable来获取它们的绝对路径。
-                return os.path.dirname(sys.executable)
-            else:
-                return os.path.dirname(__file__) # 没打包，就返回当前运行的py文件的完整路径
-        
 
+        
         # 加载图标文件，可以使用自己的图标
         # image = Image.open(get_resource_path('tmp.ico'))
         image = Image.open(os.path.join(app_path(), 'tmp.ico'))
@@ -443,7 +442,8 @@ class TextRedirector(io.TextIOBase):
             # 更新文本控件
             self.text_widget.update()
             # 将字符串追加到日志文件中
-            with open("log.txt", "a") as f:
+            # with open("log.txt", "a") as f:
+            with open(os.path.join(app_path(), "log.txt"), "a") as f:
                 f.write(s)
             # 返回字符串的长度
             return len(s)
