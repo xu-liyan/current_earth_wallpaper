@@ -1,4 +1,4 @@
-#使用PIL.Image库，处理指定图片，并设置为桌面壁纸
+#使用PIL.Image库，对获取到的卫星图片，进行处理，并设置为桌面壁纸
 
 
 import ctypes
