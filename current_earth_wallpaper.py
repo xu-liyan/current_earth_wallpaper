@@ -23,6 +23,7 @@ import winreg
 import io
 import tkinter.scrolledtext as st
 import _tkinter
+import shutil
 import auto_wallpaper_V2
 
 # 设置下载图片的网址
@@ -48,6 +49,24 @@ def app_path():
         return os.path.dirname(sys.executable)
     else:
         return os.path.dirname(__file__) # 没打包，就返回当前运行的py文件的完整路径
+    
+def clear_MEI():
+    # 获取 Temp 文件夹的路径
+    temp_path = os.environ["TEMP"]
+
+    # 遍历 Temp 文件夹中的所有文件和文件夹
+    for item in os.listdir(temp_path):
+        # 获取完整的路径
+        item_path = os.path.join(temp_path, item)
+        # 判断是否是文件夹
+        if os.path.isdir(item_path):
+            # 尝试删除文件夹，如果出错则跳过
+            try:
+                shutil.rmtree(item_path)
+                print("Clear: %s - %s." % (item_path, item))
+            except OSError as e:
+                print("Skip: %s - %s." % (e.filename, e.strerror))
+
 
 class DesktopBackgroundChanger:
     run_times = 0
@@ -76,6 +95,8 @@ class DesktopBackgroundChanger:
 
         # 定义退出函数：取消定时器线程、关闭tk窗口、关闭托盘图标、结束程序
         def quit_window(icon:pystray.Icon):
+            # 保存输入框中的配置内容、取消定时器线程、关闭托盘图标、销毁主窗口、并结束程序
+            save()
             print('times = ' , DesktopBackgroundChanger.timers)
             # 遍历列表，取消所有正在运行的定时器
             for self.timer in DesktopBackgroundChanger.timers:
@@ -194,7 +215,7 @@ class DesktopBackgroundChanger:
             self.save_path_var.set(data["save_path"])
             self.interval_var.set(data["interval_var"])
             water_button.config(text=data["water_button"])
-
+           
         # 定义一个函数，读取开机自启动状态
         def read_auto_start():
             # 获取当前程序的路径和文件名
@@ -254,6 +275,8 @@ class DesktopBackgroundChanger:
         # 定义一个函数，用于开始程序
         def start():
             if self.save_path_var.get() != "" :
+                # 保存输入框中的配置内容
+                save()
                 # 遍历列表，取消所有正在运行的定时器
                 for self.timer in DesktopBackgroundChanger.timers:
                     self.timer.cancel()
@@ -269,10 +292,10 @@ class DesktopBackgroundChanger:
                 ok_button.pack()
 
         # 定义一个函数，用于停止程序，并关闭gui界面
-        def exit():
+        def diy_exit():
             # 弹出一个确认框，询问用户是否要退出
             if messagebox.askokcancel("退出", "确定要停止程序并退出吗？"):
-                # 如果用户点击确定：保存输入框中的内容、取消定时器线程、关闭托盘图标、销毁主窗口、并结束程序
+                # 如果用户点击确定：保存输入框中的配置内容、取消定时器线程、关闭托盘图标、销毁主窗口、并结束程序
                 save()
                 # 遍历列表，取消所有正在运行的定时器
                 print('times = ' , DesktopBackgroundChanger.timers)
@@ -282,7 +305,7 @@ class DesktopBackgroundChanger:
                 self.window.destroy()
                 print('exit successful')
                 sys.exit()
-        
+
         # 定义一个函数，实现窗口居中
         def center_window(window):
             # 更新窗口的状态
@@ -303,7 +326,7 @@ class DesktopBackgroundChanger:
         # 开始、退出、时间水印、开机自启动按钮
         auto_start_flag = read_auto_start()
         start_button = ttk.Button(self.window, text='开始', command=start)
-        exit_button = ttk.Button(self.window, text='退出', command=exit)
+        exit_button = ttk.Button(self.window, text='退出', command=diy_exit)
         button_auto_start = ttk.Button(self.window, text=auto_start_flag, command=set_auto_start)
         water_button = ttk.Button(self.window, text="时间水印", command=watermark)
         start_button.pack()
@@ -335,7 +358,10 @@ class DesktopBackgroundChanger:
 
         # 调用窗口居中函数
         center_window(self.window)
-    
+
+        # 删除 Temp 文件夹中的所有文件夹
+        clear_MEI()
+
         self.window.mainloop()
 
 
@@ -384,12 +410,12 @@ class DesktopBackgroundChanger:
     def download_image(self):
         # 下载图片并保存到指定文件夹
         print('Time: ' , datetime.now().strftime('%Y%m%d_%H%M%S'))
-        print('url: ' , self.update_image_url())
-        print('image download begin')
+        print('URL: ' , self.update_image_url())
+        print('Image download begin')
         response = requests.get(self.current_image_url)
         with open(self.save_path + datetime.now().strftime('%Y%m%d_%H%M%S') + '.jpg', 'wb') as f:
             f.write(response.content)
-            print('image download end')
+            print('Image download end')
 
         # # 统计文件数量并删除最早保存的一张图片
         # files = os.listdir(self.save_path)
@@ -420,7 +446,7 @@ class DesktopBackgroundChanger:
         self.download_image()
         self.set_desktop_background()
         DesktopBackgroundChanger.run_times = DesktopBackgroundChanger.run_times + 1
-        print('run_times = ' , DesktopBackgroundChanger.run_times)
+        print('Run_times = ' , DesktopBackgroundChanger.run_times)
         print(end='\n')
         self.timer = threading.Timer(float(self.interval_var.get()) * 60, self.set_desktop_background_and_schedule_next_change)
         self.timer.start()
