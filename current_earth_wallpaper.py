@@ -412,29 +412,34 @@ class DesktopBackgroundChanger:
         print('Time: ' , datetime.now().strftime('%Y%m%d_%H%M%S'))
         print('URL: ' , self.update_image_url())
         print('Image download begin')
-        response = requests.get(self.current_image_url)
-        with open(self.save_path + datetime.now().strftime('%Y%m%d_%H%M%S') + '.jpg', 'wb') as f:
-            f.write(response.content)
-            print('Image download end')
+        try:
+            response = requests.get(self.current_image_url)
+            with open(self.save_path + datetime.now().strftime('%Y%m%d_%H%M%S') + '.jpg', 'wb') as f:
+                f.write(response.content)
+                print('Image download end')
 
-        # # 统计文件数量并删除最早保存的一张图片
-        # files = os.listdir(self.save_path)
-        # if len(files) > 48:
-        #     oldest_file = min(files, key=lambda x: os.path.getctime(self.save_path+x))
-        #     os.remove(self.save_path+oldest_file)
+            # # 统计文件数量并删除最早保存的一张图片
+            # files = os.listdir(self.save_path)
+            # if len(files) > 48:
+            #     oldest_file = min(files, key=lambda x: os.path.getctime(self.save_path+x))
+            #     os.remove(self.save_path+oldest_file)
 
-        # 统计文件数量,并删除超过48张的最早保存的图片
-        files = os.listdir(self.save_path)
-        if len(files) > 95:
-            # 对文件名按照创建时间排序，最新的在前面
-            files.sort(key=lambda x: os.path.getctime(self.save_path+x), reverse=True)
-            # 计算超过48个的文件数量
-            excess = len(files) - 95
-            # 删除所有超过48个的文件
-            for file in files[95:]:
-                os.remove(self.save_path+file)
-            # 打印删除了多少个文件
-            print(f"Deleted {excess} oldest files from {self.save_path}")
+            # 统计文件数量,并删除超过48张的最早保存的图片
+            files = os.listdir(self.save_path)
+            if len(files) > 95:
+                # 对文件名按照创建时间排序，最新的在前面
+                files.sort(key=lambda x: os.path.getctime(self.save_path+x), reverse=True)
+                # 计算超过48个的文件数量
+                excess = len(files) - 95
+                # 删除所有超过48个的文件
+                for file in files[95:]:
+                    os.remove(self.save_path+file)
+                # 打印删除了多少个文件
+                print(f"Deleted {excess} oldest files from {self.save_path}")
+        except requests.exceptions.RequestException as e:
+            # 处理图片下载异常或失败
+            print('Image download failed')
+            return # 跳出当前函数
 
     def set_desktop_background_and_schedule_next_change(self):
         # 遍历列表，检查每个定时器是否还在运行
