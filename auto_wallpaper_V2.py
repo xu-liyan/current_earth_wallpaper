@@ -1,11 +1,11 @@
-#使用PIL.Image库，对获取到的卫星图片，进行处理，并设置为桌面壁纸
-
+#使用PIL.Image库，处理指定图片，并设置为桌面壁纸
 
 import ctypes
 import PIL
-from PIL import Image, ImageDraw, ImageFont, ImageGrab
+from PIL import Image, ImageDraw, ImageFont, ImageGrab, ImageFile
 import mss
 import datetime
+# from io import BytesIO
 
 global screen_width, screen_height, watermark_x, watermark_y, watermark_font
 # 创建一个mss对象，获取显示器的分辨率
@@ -41,8 +41,14 @@ def changeBG(imagePath):
 
 # 定义一个处理图片的函数，接受一个图片路径作为参数
 def resize_image(imagePath , folder_path , name_pic , current_url , flag , watermark_flag):
-    # 使用PIL模块的Image类打开图片
-    image = PIL.Image.open(imagePath)
+    try:
+        # 使用PIL模块的Image类打开图片
+        image = PIL.Image.open(imagePath)
+    except PIL.UnidentifiedImageError as e:
+        # 处理图片打开异常或失败
+        print('Image open failed')
+        # 跳出当前函数
+        return None
     # 获取图片的原始宽度和高度
     width, height = image.size
     # 获取显示器的分辨率
@@ -52,12 +58,26 @@ def resize_image(imagePath , folder_path , name_pic , current_url , flag , water
     # 计算新的宽度和高度，保持原始图片的纵横比
     new_width = int(width * ratio)
     new_height = int(height * ratio)
+
+    # 第一种处理图片数据截断的方法（需import ImageFile）：
+    #   当遇到数据截断的图片时，PIL会直接break，跳出函数，不报错，进行下一个
+    ImageFile.LOAD_TRUNCATED_IMAGES = True
+
+    # # 第二种处理图片数据截断的方法（需from io import BytesIO）：
+    # # 读取图片文件为二进制数据
+    # with open(imagePath, 'rb') as f:
+    #     f = f.read()
+    # # 在二进制数据的末尾补上标识符\xff\xd9
+    # f = f + b'\xff' + b'\xd9'
+    # # 将二进制数据转换为图片对象
+    # image = Image.open(BytesIO(f))
+
     # 使用PIL模块的Image类的resize方法调整图片大小
     # 第一个参数是新的宽度和高度的元组，第二个参数是缩放算法
     resized_image = image.resize((new_width, new_height), PIL.Image.LANCZOS)
     img = resized_image
     print('Image resized successful')
-
+    
     # 将图片先裁剪为方形，再裁剪为圆形（如果直接裁剪为圆形，很容易因为图片计算过程过程中四舍五入，导致创建的画布大小和图片大小不匹配而报错
     #将图片裁剪为方形
     if current_url == 'FY4A':
@@ -115,4 +135,6 @@ def resize_image(imagePath , folder_path , name_pic , current_url , flag , water
 # 调用changeBG函数，传入wallpaper变量作为参数
 def changewall(image_path , folder_path , name_pic , current_url , flag , watermark_flag):
     path = resize_image(image_path , folder_path , name_pic , current_url , flag , watermark_flag)
+    if path == None :
+        return
     changeBG(path)
