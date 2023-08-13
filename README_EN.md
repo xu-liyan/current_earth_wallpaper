@@ -23,6 +23,7 @@ The GUI window of the software is shown in the figure below:
 **3. Select image save location**
 * The original image and the generated wallpaper image will be saved in this folder
 * The maximum number of images saved in the folder is 96. After that, the oldest files will be deleted one by one, leaving 96 images
+* **Notice! Do not store other files in this folder, otherwise, after the number exceeds 96, it will be deleted from the oldest file! ! !**
 
 **4. Image acquisition frequency**
 * Each time an image is acquired, the wallpaper is also updated, in minutes
