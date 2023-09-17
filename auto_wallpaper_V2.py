@@ -80,9 +80,9 @@ def resize_image(imagePath , folder_path , name_pic , current_url , flag , water
     
     # 将图片先裁剪为方形，再裁剪为圆形（如果直接裁剪为圆形，很容易因为图片计算过程过程中四舍五入，导致创建的画布大小和图片大小不匹配而报错
     #将图片裁剪为方形
-    if current_url == 'FY4A':
+    if current_url == '风云4A':
         FY4_s, FY4_x, FY4_y = 2170 * ratio, 15 * ratio, 15 * ratio
-    elif current_url == 'FY4B':
+    elif current_url == '风云4B':
         FY4_s, FY4_x, FY4_y = 10835 * ratio, 65 * ratio, 80 * ratio
 
     box=(FY4_x, FY4_y, FY4_s+FY4_x, FY4_s+FY4_y)
