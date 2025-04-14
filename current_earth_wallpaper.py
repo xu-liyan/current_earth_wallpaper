@@ -543,7 +543,9 @@ class DesktopBackgroundChanger:
         print('URL: ' , self.update_image_url())
         print('Image download begin')
         try:
-            response = requests.get(self.current_image_url)
+            # 使用本地证书文件
+            CERT_PATH = os.path.join("certs", "cacert.pem")
+            response = requests.get(self.current_image_url, verify=CERT_PATH)
             with open(self.save_path + datetime.now().strftime('%Y%m%d_%H%M%S') + '.jpg', 'wb') as f:
                 f.write(response.content)
                 print('Image download end')
