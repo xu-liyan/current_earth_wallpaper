@@ -3,7 +3,7 @@
 
 **获取"风云4A"或“风云4B”的实时卫星云图，重绘图片，根据当前屏幕分辨率，生成桌面壁纸**
 
-软件的的GUI窗口，见下图：
+软件GUI窗口，见下图：
 
 <div align=center><img src="https://github.com/xu-liyan/current_earth_wallpaper/assets/43141587/a455bb0b-6364-458f-9af6-366e0cb3809a"></div>
 
