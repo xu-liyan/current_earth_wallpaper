@@ -544,7 +544,12 @@ class DesktopBackgroundChanger:
         print('Image download begin')
         try:
             # 使用本地证书文件
-            CERT_PATH = os.path.join("certs", "cacert.pem")
+            CERT_PATH = os.path.join(app_path(), "certs", "cacert.pem")
+            # CA证书加载检查
+            if os.path.exists(CERT_PATH):
+               print('CA证书加载成功') 
+            if not os.path.exists(CERT_PATH):
+                raise FileNotFoundError(f"CA证书不存在: {CERT_PATH}")
             response = requests.get(self.current_image_url, verify=CERT_PATH)
             with open(self.save_path + datetime.now().strftime('%Y%m%d_%H%M%S') + '.jpg', 'wb') as f:
                 f.write(response.content)
