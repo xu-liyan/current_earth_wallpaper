@@ -45,5 +45,5 @@
 * 此项目核心框架和GUI界面的代码由 [**ChatGPT**](https://chat.openai.com/chat) 生成
 * GOES-R系列卫星云图下载链接提取的代码由 [**DeepSeek**](https://www.deepseek.com/) 生成
 * README的格式以及翻译由 [**Qwen**](https://www.tongyi.com/qianwen/) 生成
-* 此项目的想法来自于 [**wenkechen**](https://github.com/wenkechen) 的项目 [**MineEarth**](https://github.com/wenkechen/MineEarth) 。以前曾使用过这款程序，但存在一些问题，作者长期未更新，且图像源只有“向日葵8号”。遂，在AI的帮助下创建了此项目
+* 此项目的想法来自于 [**wksama**](https://github.com/wksama) 的项目 [**MineEarth**](https://github.com/wenkechen/MineEarth) 。以前曾使用过这款程序，但存在一些问题，作者长期未更新，且图像源只有“向日葵8号”。遂，在AI的帮助下创建了此项目
 * 图像处理代码，其中一部分参考了 [**Jiale685**](https://blog.csdn.net/L141210113/article/details/102642277?spm=1001.2014.3001.5506) 的项目
