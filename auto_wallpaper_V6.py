@@ -40,13 +40,19 @@ def changeBG(imagePath):
 
 
 # 定义一个处理图片的函数，接受一个图片路径作为参数
-def resize_image(imagePath , folder_path , name_pic , current_url , flag , watermark_flag):
+def resize_image(imagePath , folder_path , name_pic , current_image_source , flag , watermark_flag):
+
+    print('Wallpaper generate begin')
+
+    # 设置更高的像素限制
+    Image.MAX_IMAGE_PIXELS = 700000000  # 7亿像素
+
     try:
         # 使用PIL模块的Image类打开图片
         image = PIL.Image.open(imagePath)
     except PIL.UnidentifiedImageError as e:
         # 处理图片打开异常或失败
-        print('Image open failed')
+        print('！！Image open failed')
         # 跳出当前函数
         return None
     # 获取图片的原始宽度和高度
@@ -76,14 +82,16 @@ def resize_image(imagePath , folder_path , name_pic , current_url , flag , water
     # 第一个参数是新的宽度和高度的元组，第二个参数是缩放算法
     resized_image = image.resize((new_width, new_height), PIL.Image.LANCZOS)
     img = resized_image
-    print('Image resized successful')
+    # print('Image resized successful')
     
     # 将图片先裁剪为方形，再裁剪为圆形（如果直接裁剪为圆形，很容易因为图片计算过程过程中四舍五入，导致创建的画布大小和图片大小不匹配而报错
     #将图片裁剪为方形
-    if current_url == '风云4A':
+    if current_image_source == '风云4A':
         FY4_s, FY4_x, FY4_y = 2170 * ratio, 15 * ratio, 15 * ratio
-    elif current_url == '风云4B':
+    elif current_image_source == '风云4B':
         FY4_s, FY4_x, FY4_y = 10835 * ratio, 65 * ratio, 80 * ratio
+    elif current_image_source == 'GOES-East' or current_image_source == 'GOES-West':
+        FY4_s, FY4_x, FY4_y = 10800 * ratio, 24 * ratio, 24 * ratio
 
     box=(FY4_x, FY4_y, FY4_s+FY4_x, FY4_s+FY4_y)
     img = img.crop(box)
@@ -94,7 +102,7 @@ def resize_image(imagePath , folder_path , name_pic , current_url , flag , water
     draw = ImageDraw.Draw(mask) # 创建一个绘图对象
     draw.ellipse((0, 0, FY4_s, FY4_s), fill=255) # 绘制一个白色的圆形
     img.putalpha(mask) # 将圆形作为透明度掩码
-    print('Image redraw successful')
+    # print('Image redraw successful')
 
     #设置缩放比
     if flag == 0:
@@ -133,8 +141,8 @@ def resize_image(imagePath , folder_path , name_pic , current_url , flag , water
 
 
 # 调用changeBG函数，传入wallpaper变量作为参数
-def changewall(image_path , folder_path , name_pic , current_url , flag , watermark_flag):
-    path = resize_image(image_path , folder_path , name_pic , current_url , flag , watermark_flag)
+def changewall(image_path , folder_path , name_pic , current_image_source , flag , watermark_flag):
+    path = resize_image(image_path , folder_path , name_pic , current_image_source , flag , watermark_flag)
     if path == None :
         return
     changeBG(path)
