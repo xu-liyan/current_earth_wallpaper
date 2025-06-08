@@ -530,8 +530,16 @@ class DesktopBackgroundChanger:
                 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
                 'Referer': 'https://www.star.nesdis.noaa.gov/goes/'
             }
-            
-            response = requests.get(page_url, headers=headers, timeout=15)
+            # 使用本地证书文件
+            CERT_PATH = os.path.join(app_path(), "certs", "cacert.pem")
+            # CA证书加载检查
+            # if os.path.exists(CERT_PATH):
+            #    print('CA certificate successfully loaded') 
+            # if not os.path.exists(CERT_PATH):
+            #     raise FileNotFoundError(f"CA certificate doesn't exist: {CERT_PATH}")
+
+
+            response = requests.get(page_url, verify=CERT_PATH, headers=headers, timeout=15)
             response.raise_for_status()  # 检查HTTP错误
             
             # 解析HTML内容
@@ -543,7 +551,7 @@ class DesktopBackgroundChanger:
             # 查找包含目标字符串的链接
             # pattern = re.compile(r'GEOCOLOR-21696x21696.jpg', re.IGNORECASE)  # 图片大小会超过40MB，下载非常缓慢，遂放弃
             pattern = re.compile(r'GEOCOLOR-10848x10848.jpg', re.IGNORECASE)  # 图片大小20MB左右
-            
+
             # 存储找到的目标链接
             target_links = []
             
@@ -569,10 +577,12 @@ class DesktopBackgroundChanger:
             return target_url
         
         except requests.exceptions.RequestException as e:
-            print(f"！！Network request failed")
+            print(f"！！Network request failed: {str(e)}")
+            # print(f"网络请求失败: {str(e)}")
             return None
         except Exception as e:
-            print(f"！！Error during image link extraction")
+            print(f"！！Error during image link extraction: {str(e)}")
+            # print(f"处理过程中出错: {str(e)}")
             return None
     
     def scale_flag(self):
@@ -694,12 +704,13 @@ class DesktopBackgroundChanger:
                 print(f"Deleted {excess} oldest files from {self.save_path}")
         
         except requests.exceptions.RequestException as e:
-            print(f"！！Error during download: Please check the network connection")
+            print(f"！！Error during download: {str(e)}")
+            # print(f"下载过程中出错: {str(e)}")
             print("\n" + "="*48 + "\n")
             state = 0
             return state
         except Exception as e:
-            print(f"！！Error during saving: Please check the save path")
+            print(f"！！Error during saving: {str(e)}")
             # print(f"保存过程中出错: {str(e)}")
             print("\n" + "="*48 + "\n")
             state = 0
