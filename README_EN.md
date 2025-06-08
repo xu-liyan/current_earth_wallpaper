@@ -1,46 +1,48 @@
-# Real-time satellite cloud map wallpaper of the Earth
+# Real-Time Satellite Cloud Map Wallpaper for Earth
 [**简体中文**](README.md) | **English**
 
-**Get the real-time satellite cloud map of "Fengyun 4A" or "Fengyun 4B", redraw the image, and generate desktop wallpaper according to the current screen resolution**
+**Get real-time satellite cloud maps from "FY-4B" or the "GOES-R series", re-render the images, and generate a desktop wallpaper based on your current screen resolution**
 
-The GUI window of the software is shown in the figure below:
+GUI window of the software is shown below:
 
-<div align=center><img src="https://github.com/xu-liyan/current_earth_wallpaper/assets/43141587/9800ebda-0f9b-4a43-81dd-f3c857f608d6"></div>
-
+<div align=center><img src="https://github.com/xu-liyan/current_earth_wallpaper/assets/43141587/c32ce7e7-49ec-44a3-b253-f652e4a35aec"></div>
 
 ## Features
-**1. Select image source**
-* You can choose **"Fengyun 4A"** or **"Fengyun 4B"** as the image source
-* In the cloud map of Fengyun 4A, the mainland China area is located above the image, the satellite cloud map resolution is not very high, and the overall color tone is reddish
-* In the cloud map of Fengyun 4B, the mainland China area is located in the upper left corner of the image, the satellite cloud map resolution is relatively high, and the overall color tone is better than Fengyun 4A
-* The size of Fengyun 4A satellite cloud map does not exceed ***1MB***, and the size of Fengyun 4B satellite cloud map can reach up to ***20MB***. Choose the appropriate image source according to your own network environment
+**1. Select Image Source**
+* Choose **"FY-4B"**, **"GOES-East"**, or **"GOES-West"** as the image source
+* FY-4B satellite cloud maps cover Asia, the western Pacific, the eastern Indian Ocean, and parts of Australia
+* GOES-East satellite cloud maps cover North America, South America, and the Atlantic region
+* GOES-West satellite cloud maps cover western North America and the eastern Pacific region
+* The size of GOES-R series satellite cloud maps can reach up to ***20 MB***. Direct downloads from mainland China may be very slow. Choose an appropriate image source based on your network environment.
+* Note: FY-4A satellite cloud maps have been officially discontinued, and their image source has been removed.
 
-**2. Choose wallpaper ratio**
-* **Fill screen:** The original image is scaled to the screen resolution, cropped and adjusted to the screen height
-* **Original size:** The original image is scaled to the screen resolution, cropped and kept at 'original size'
-* **Golden ratio:** The original image is scaled to the screen resolution, cropped and kept at a fixed aspect ratio, with a height adjusted to '0.618 times' of the screen height
-* **Smaller size:** The original image is scaled to the screen resolution, cropped and kept at a fixed aspect ratio, with a height adjusted to '0.45 times' of the screen height
+**2. Select Wallpaper Aspect Ratio**
+* **Fill Screen:** Resize the original image to the screen resolution, crop it, and maintain the image aspect ratio while adjusting the height to match the screen height
+* **Original Size:** Resize the original image to the screen resolution, crop it, and maintain the original size of the image
+* **Golden Ratio:** Resize the original image to the screen resolution, crop it, and maintain the aspect ratio while adjusting the height to **0.618** of the screen height
+* **Smaller Size:** Resize the original image to the screen resolution, crop it, and maintain the aspect ratio while adjusting the height to **0.45** of the screen height
 
-**3. Select image save location**
-* The original image and the generated wallpaper image will be saved in this folder
-* The maximum number of images saved in the folder is 96. After that, the oldest files will be deleted one by one, leaving 96 images
-* **Notice! Do not store other files in this folder, otherwise, after the number exceeds 96, it will be deleted from the oldest file! ! !**
+**3. Select Image Save Location**
+* Both the original images and generated wallpapers will be saved in this folder
+* The folder stores a maximum of 96 images. If the number exceeds this limit, the oldest files will be deleted sequentially until 96 images remain
+* ***Warning! Do not store other files in this folder, as exceeding 96 files will cause the oldest files to be deleted automatically!!!***
 
-**4. Image acquisition frequency**
-* Each time an image is acquired, the wallpaper is also updated, in minutes
-* The official update frequency of Fengyun 4A satellite image is 60 minutes. If the image source is "FY4A", it is recommended that the image acquisition frequency be ≥60 minutes
-* The official update frequency of Fengyun 4B satellite image is 15 minutes. If the image source is "FY4B", it is recommended that the image acquisition frequency be ≥15 minutes
+**4. Image Fetch Frequency**
+* The wallpaper updates every time an image is fetched. The unit is in minutes.
+* FY-4B satellite images are officially updated every 15 minutes. If "FY-4B" is selected as the image source, it is recommended to set the fetch frequency to **≥30 minutes**.
+* GOES-R series satellite images are officially updated every 10 minutes. If "GOES-East" or "GOES-West" is selected as the image source, it is recommended to set the fetch frequency to **≥30 minutes**.
 
 ## Tips
-* Click on the "Start" button and the program will automatically change wallpapers according to the set parameters and frequency
-* Click on the "Exit" button and a confirmation window will pop up. Click "OK" to exit completely
-* Click on the “Add/Cancel Time Watermark” button and a time watermark will be added/cancelled in the lower right corner of the wallpaper for easy viewing of satellite cloud map update time
-* Click on the “Set/Cancel Startup” button and the program will automatically open and start updating wallpapers when system starts up without having to manually click “Start”. To cancel, click this button again
-* Click the language drop-down box and select the corresponding language. The language displayed by the entire software will switch in real time
-* The bottom of the main interface is the “Run Log” display box, which can feedback the program running status
-* Close program GUI window and program will continue running in background by default. You can see program icon in status bar tray area. Click on program icon in tray to restore GUI window. Right-click on icon will pop up menu where you can choose to show window or exit completely
+* Click the **"Start"** button to automatically download satellite cloud maps and update the wallpaper at the set parameters and frequency.
+* Click the **"Exit"** button to display a confirmation window. Click **"Confirm"** to fully exit the program.
+* Click the **"Add/Remove Time Watermark"** button to add or remove a time watermark in the bottom-right corner of the wallpaper for easy reference to the update time.
+* Click the **"Enable/Disable Startup"** button to enable or disable the program from starting automatically at system boot. If enabled, the program will start and update the wallpaper automatically without manually clicking **"Start"**.
+* The **"Operation Log"** display box at the bottom of the main interface shows the program's runtime status.
+* Closing the GUI window will keep the program running in the background. You can see the program icon in the system tray. Click the tray icon to restore the GUI window. Right-click the icon to open a menu and select options like **"Show Window"** or **"Exit Completely"**.
 
-# Acknowledgements
-* The core framework and GUI interface code for this project was generated by [**ChatGPT**](https://chat.openai.com/chat) (ChatGPT is indeed powerful, but there are also many problems with its generated code, so please use it carefully)
-* The idea for this project came from [**wenkechen**](https://github.com/wenkechen)'s project [**MineEarth**](https://github.com/wenkechen/MineEarth). I used this program a few years ago, but there were some problems with it. The author has not updated it for a long time and only has "Himawari 8" as an image source. I personally wanted to have the Fengyun satellite image, so I created this project with the help of ChatGPT
-* Some of the image processing code was referenced from [**Jiale685**](https://blog.csdn.net/L141210113/article/details/102642277?spm=1001.2014.3001.5506)'s project
+# Acknowledgments
+* The core framework and GUI code for this project were generated by [**ChatGPT**](https://chat.openai.com/chat)
+* The code for extracting GOES-R series satellite image download links was generated by [**DeepSeek**](https://www.deepseek.com/)
+* The formatting and translation of this README were generated by [**Qwen**](https://www.tongyi.com/qianwen/)
+* This project was inspired by  [**wksama**](https://github.com/wksama)'s project [**MineEarth**](https://github.com/wenkechen/MineEarth). I previously used this program but encountered some issues. The author has not updated it for a long time, and the only available image source was "Himawari 8." With the help of AI, I created this project.
+* Part of the image processing code was referenced from [**Jiale685**](https://blog.csdn.net/L141210113/article/details/102642277?spm=1001.2014.3001.5506)'s project.
