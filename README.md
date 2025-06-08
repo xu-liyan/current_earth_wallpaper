@@ -5,7 +5,7 @@
 
 软件的的GUI窗口，见下图：
 
-<div align=center><img src="https://github.com/xu-liyan/current_earth_wallpaper/assets/43141587/c32ce7e7-49ec-44a3-b253-f652e4a35aec"></div>
+<div align=center><img src="https://github.com/user-attachments/assets/dc00180c-ea0a-4089-87b1-bceb1df9bd7c"></div>
 ![PixPin_2025-06-08_01-50-14](https://github.com/user-attachments/assets/dc00180c-ea0a-4089-87b1-bceb1df9bd7c)
 
 
