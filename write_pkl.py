@@ -4,7 +4,7 @@ import pickle
 def save():
             # 创建一个字典，存放输入框中的内容
             writedata = {
-                "current_url": '风云4A',
+                "current_url": '风云4B',
                 "current_scale": '黄金比例',
                 "save_path": '',
                 "interval_var": '30',
@@ -13,8 +13,9 @@ def save():
                 '中文': {
                     '窗口名称': '实时地球',
                     '选择图像源': '选择图像源',
-                    '风云4A': '风云4A',
                     '风云4B': '风云4B',
+                    'GOES-East': 'GOES-East',
+                    'GOES-West': 'GOES-West',
                     '选择壁纸比例': '选择壁纸比例',
                     '铺满屏幕': '铺满屏幕',
                     '原始大小': '原始大小',
@@ -40,8 +41,9 @@ def save():
                 'English': {
                     '窗口名称': 'Current Earth',
                     '选择图像源': 'Select image source',
-                    '风云4A': 'FY4A',
                     '风云4B': 'FY4B',
+                    'GOES-East': 'GOES-East',
+                    'GOES-West': 'GOES-West',
                     '选择壁纸比例': 'Select wallpaper ratio',
                     '铺满屏幕': 'Fill Screen',
                     '原始大小': 'Original Size',
