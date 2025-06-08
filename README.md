@@ -6,8 +6,6 @@
 软件的的GUI窗口，见下图：
 
 <div align=center><img src="https://github.com/user-attachments/assets/dc00180c-ea0a-4089-87b1-bceb1df9bd7c"></div>
-![PixPin_2025-06-08_01-50-14](https://github.com/user-attachments/assets/dc00180c-ea0a-4089-87b1-bceb1df9bd7c)
-
 
 
 ## 功能
