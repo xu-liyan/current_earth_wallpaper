@@ -1,6 +1,5 @@
 '''
-1、启动程序之后，从网址“http://img.nsmc.org.cn/CLOUDIMAGE/FY4A/MTCC/FY4A_DISK.JPG”或
-“http://img.nsmc.org.cn/CLOUDIMAGE/FY4B/AGRI/GCLR/FY4B_DISK_GCLR.JPG”获取图片，并保存到指定文件夹，图片名称以获取图片的具体日期和时间命名
+1、启动程序之后，从所选择的图像源获取最新卫星图片，并保存到指定文件夹，图片名称以获取图片的具体日期和时间命名
 2、可以自行选择从哪个网址获取图片
 3、每隔xx分钟获取一张图片，并根据当前显示屏分辨率，将图片设置为桌面背景
 4、文件夹图片最大保存数量为96张，超过之后从最旧的文件开始依次删除，最终保留96张图片
@@ -9,6 +8,7 @@
 '''
 
 import os
+import re
 import requests
 import threading
 from datetime import datetime
@@ -22,6 +22,8 @@ import sys
 import pickle
 import winreg
 import io
+from bs4 import BeautifulSoup
+from urllib.parse import urljoin, urlparse
 import tkinter.scrolledtext as st
 import _tkinter
 import shutil
@@ -31,8 +33,9 @@ global loaddata
 
 # 设置下载图片的网址
 IMAGE_URLS = {
-    '风云4A': 'http://img.nsmc.org.cn/CLOUDIMAGE/FY4A/MTCC/FY4A_DISK.JPG',
     '风云4B': 'http://img.nsmc.org.cn/CLOUDIMAGE/FY4B/AGRI/GCLR/FY4B_DISK_GCLR.JPG',
+    'GOES-East': 'https://www.star.nesdis.noaa.gov/goes/fulldisk.php?sat=G19',
+    'GOES-West': 'https://www.star.nesdis.noaa.gov/goes/fulldisk.php?sat=G18',
 }
 
 # 设置壁纸缩放比例
@@ -86,7 +89,7 @@ class DesktopBackgroundChanger:
         self.interval = interval
         self.timer = None
         self.image_urls = IMAGE_URLS
-        self.current_image_url = self.image_urls['风云4A']
+        self.current_image_url = self.image_urls['风云4B']
         self.scale = scale
         self.current_image_scale = self.scale['黄金比例']
         self.save_path = ''
@@ -275,8 +278,9 @@ class DesktopBackgroundChanger:
                 '中文': {
                     '窗口名称': '实时地球',
                     '选择图像源': '选择图像源',
-                    '风云4A': '风云4A',
                     '风云4B': '风云4B',
+                    'GOES-East': 'GOES-East',
+                    'GOES-West': 'GOES-West',
                     '选择壁纸比例': '选择壁纸比例',
                     '铺满屏幕': '铺满屏幕',
                     '原始大小': '原始大小',
@@ -302,8 +306,9 @@ class DesktopBackgroundChanger:
                 'English': {
                     '窗口名称': 'Current Earth',
                     '选择图像源': 'Select image source',
-                    '风云4A': 'FY4A',
                     '风云4B': 'FY4B',
+                    'GOES-East': 'GOES-East',
+                    'GOES-West': 'GOES-West',
                     '选择壁纸比例': 'Select wallpaper ratio',
                     '铺满屏幕': 'Fill Screen',
                     '原始大小': 'Original Size',
@@ -497,11 +502,78 @@ class DesktopBackgroundChanger:
 
     def update_image_url(self):
         self.current_image_url = self.image_urls[self.current_url_var.get()]
-        if self.current_image_url == IMAGE_URLS['风云4A'] :
-            current_url = '风云4A'
-        elif self.current_image_url == IMAGE_URLS['风云4B'] :
-            current_url = '风云4B'
-        return current_url
+        if self.current_image_url == IMAGE_URLS['风云4B'] :
+            current_image_source = '风云4B'
+        elif self.current_image_url == IMAGE_URLS['GOES-East'] :
+            current_image_source = 'GOES-East'
+        elif self.current_image_url == IMAGE_URLS['GOES-West'] :
+            current_image_source = 'GOES-West'
+        return current_image_source
+    
+    def get_image_url(self):
+        """
+        从NOAA卫星图像页面提取包含"GEOCOLOR-10848x10848.jpg"的图片链接
+        
+        参数:
+            page_url: NOAA卫星图像页面URL
+        
+        返回:
+            找到的图像下载URL，如果没有找到则返回None
+        """
+        print('Extract image links begin')
+        self.current_image_url = self.image_urls[self.current_url_var.get()]
+        page_url = self.current_image_url
+
+        try:
+            # 设置浏览器用户代理头
+            headers = {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+                'Referer': 'https://www.star.nesdis.noaa.gov/goes/'
+            }
+            
+            response = requests.get(page_url, headers=headers, timeout=15)
+            response.raise_for_status()  # 检查HTTP错误
+            
+            # 解析HTML内容
+            soup = BeautifulSoup(response.text, 'html.parser')
+            
+            # 查找所有链接元素（<a>标签）
+            links = soup.find_all('a')
+            
+            # 查找包含目标字符串的链接
+            # pattern = re.compile(r'GEOCOLOR-21696x21696.jpg', re.IGNORECASE)  # 图片大小会超过40MB，下载非常缓慢，遂放弃
+            pattern = re.compile(r'GEOCOLOR-10848x10848.jpg', re.IGNORECASE)  # 图片大小20MB左右
+            
+            # 存储找到的目标链接
+            target_links = []
+            
+            for link in links:
+                href = link.get('href', '')
+                if pattern.search(href):
+                    # 构建完整URL
+                    full_url = urljoin(page_url, href)
+                    target_links.append(full_url)
+                    print(f"Find the link to the target image")
+            
+            # 检查是否找到目标链接
+            if not target_links:
+                print("！！No links containing 'GEOCOLOR-10848x10848.jpg' were found")
+                return None
+            
+            # 添加时间戳参数避免缓存问题
+            target_url = target_links[0]
+            parsed = urlparse(target_url)
+            if not parsed.query:
+                target_url += f"?t={int(time.time())}"
+            
+            return target_url
+        
+        except requests.exceptions.RequestException as e:
+            print(f"！！Network request failed")
+            return None
+        except Exception as e:
+            print(f"！！Error during image link extraction")
+            return None
     
     def scale_flag(self):
         self.current_image_scale = self.scale[self.current_scale_var.get()]
@@ -531,35 +603,82 @@ class DesktopBackgroundChanger:
         # 使用os.path.splitext()函数，获取最新文件的名称不含后缀
         latest_file_name_without_extension = os.path.splitext(latest_file_name)[0]
         name_pic = latest_file_name_without_extension
-        current_url = self.update_image_url()
+        current_image_source = self.update_image_url()
         flag = self.scale_flag()
         watermark_flag = DesktopBackgroundChanger.watermark_flag
-        auto_wallpaper_V6.changewall(latest_file_path , folder_path , name_pic , current_url , flag , watermark_flag)
+        auto_wallpaper_V6.changewall(latest_file_path , folder_path , name_pic , current_image_source , flag , watermark_flag)
         
 
     def download_image(self):
         # 下载图片并保存到指定文件夹
-        print('Time: ' , datetime.now().strftime('%Y%m%d_%H%M%S'))
-        print('URL: ' , self.update_image_url())
+        print('Time:' , datetime.now().strftime('%Y%m%d_%H%M%S'))
+        print('Image source:' , self.update_image_url())
         print('Image download begin')
+        state = 1
+        current_image_source = self.update_image_url()
+
         try:
+            # 设置请求头
+            headers = {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+            }
             # 使用本地证书文件
             CERT_PATH = os.path.join(app_path(), "certs", "cacert.pem")
             # CA证书加载检查
             if os.path.exists(CERT_PATH):
-               print('CA证书加载成功') 
+               print('CA certificate successfully loaded') 
             if not os.path.exists(CERT_PATH):
-                raise FileNotFoundError(f"CA证书不存在: {CERT_PATH}")
-            response = requests.get(self.current_image_url, verify=CERT_PATH)
-            with open(self.save_path + datetime.now().strftime('%Y%m%d_%H%M%S') + '.jpg', 'wb') as f:
-                f.write(response.content)
-                print('Image download end')
+                raise FileNotFoundError(f"CA certificate doesn't exist: {CERT_PATH}")
+            
+            # 下载图片（使用流式下载支持大文件）
+            if current_image_source == '风云4B':
+                response = requests.get(self.current_image_url, verify=CERT_PATH, headers=headers, stream=True, timeout=60)
+            elif current_image_source == 'GOES-East' or current_image_source == 'GOES-West':
+                current_image_url = self.get_image_url()
+                response = requests.get(current_image_url, verify=CERT_PATH, headers=headers, stream=True, timeout=60)
 
-            # # 统计文件数量并删除最早保存的一张图片
-            # files = os.listdir(self.save_path)
-            # if len(files) > 48:
-            #     oldest_file = min(files, key=lambda x: os.path.getctime(self.save_path+x))
-            #     os.remove(self.save_path+oldest_file)
+            if response.status_code == 200:
+                # 获取文件大小（用于进度显示）
+                total_size = int(response.headers.get('content-length', 0))
+                print(f"Image Size: {total_size / (1024 * 1024):.2f} MB")
+
+                # 初始化变量
+                downloaded_size = 0
+                start_time = time.time()
+                next_threshold = 25  # 下一个要打印的进度阈值
+
+                # 写入文件
+                with open(self.save_path + datetime.now().strftime('%Y%m%d_%H%M%S') + '.jpg', 'wb') as f:
+                    # f.write(response.content)
+                    for chunk in response.iter_content(chunk_size=8192):
+                        if chunk:  # 过滤保持连接的chunk
+                            f.write(chunk)
+                            downloaded_size += len(chunk)
+                            
+                            # 计算当前进度百分比
+                            if total_size > 0:
+                                percent = (downloaded_size / total_size) * 100
+                                
+                                # 检查是否达到下一个25%阈值或下载完成
+                                if percent >= next_threshold or downloaded_size == total_size:
+                                    # 计算下载速度
+                                    current_time = time.time()
+                                    elapsed = current_time - start_time
+                                    speed = (downloaded_size / (1024 * 1024)) / elapsed if elapsed > 0 else 0
+                                    
+                                    # 计算当前速度（MB/s）
+                                    print(f"Download progress: {percent:.1f}% | Speed: {speed:.2f} MB/s")
+                                    
+                                    # 更新阈值和最后打印时间
+                                    next_threshold = min(100, next_threshold + 25)
+                    
+                print('Image download successful') 
+                elapsed = time.time() - start_time
+                print(f"Total time consumption: {elapsed:.2f} s")
+            else:
+                print(f'！！Download failed with status code: {response.status_code}')
+                state = 0
+                return state
 
             # 统计文件数量,并删除超过96张的最早保存的图片
             files = os.listdir(self.save_path)
@@ -573,10 +692,18 @@ class DesktopBackgroundChanger:
                     os.remove(self.save_path+file)
                 # 打印删除了多少个文件
                 print(f"Deleted {excess} oldest files from {self.save_path}")
+        
         except requests.exceptions.RequestException as e:
-            # 处理图片下载异常或失败
-            print('Image download failed')
-            return # 跳出当前函数
+            print(f"！！Error during download: Please check the network connection")
+            print("\n" + "="*48 + "\n")
+            state = 0
+            return state
+        except Exception as e:
+            print(f"！！Error during saving: Please check the save path")
+            # print(f"保存过程中出错: {str(e)}")
+            print("\n" + "="*48 + "\n")
+            state = 0
+            return state
 
     def set_desktop_background_and_schedule_next_change(self):
         # 遍历列表，检查每个定时器是否还在运行
@@ -585,11 +712,14 @@ class DesktopBackgroundChanger:
             if not self.timer.is_alive():
                 DesktopBackgroundChanger.timers.remove(self.timer)
 
-        self.download_image()
+        # self.download_image()
+        state = self.download_image()
+        if state == 0 :
+            return None
         self.set_desktop_background()
         DesktopBackgroundChanger.run_times = DesktopBackgroundChanger.run_times + 1
         print('Run_times = ' , DesktopBackgroundChanger.run_times)
-        print(end='\n')
+        print("\n" + "="*48 + "\n")
         self.timer = threading.Timer(float(self.interval_var.get()) * 60, self.set_desktop_background_and_schedule_next_change)
         self.timer.start()
         DesktopBackgroundChanger.timers.append(self.timer)  #把定时器对象加入到列表中
