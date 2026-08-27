@@ -1,0 +1,5 @@
+requests>=2.28
+beautifulsoup4>=4.11
+Pillow>=9.2
+pystray>=0.19
+mss>=7.0
