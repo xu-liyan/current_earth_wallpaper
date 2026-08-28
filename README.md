@@ -5,7 +5,7 @@
 
 软件的的GUI窗口，见下图：
 
-<img width="388" height="756" alt="image" src="https://github.com/user-attachments/assets/d7259014-0df0-4054-93c6-f2356ea2c250" />
+<div align=center><img width="388" height="756" alt="image" src="https://github.com/user-attachments/assets/d7259014-0df0-4054-93c6-f2356ea2c250" /></div>
 
 
 
