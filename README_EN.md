@@ -5,7 +5,7 @@
 
 GUI window of the software is shown below:
 
-<div align=center><img src="https://github.com/xu-liyan/current_earth_wallpaper/assets/43141587/c32ce7e7-49ec-44a3-b253-f652e4a35aec"></div>
+<div align=center><img width="388" height="756" alt="image" src="https://github.com/user-attachments/assets/de74037b-86d6-427c-8d6b-e2adf95d16e0" /></div>
 
 ## Features
 **1. Select Image Source**
