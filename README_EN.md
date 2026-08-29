@@ -5,7 +5,10 @@
 
 GUI window of the software is shown below:
 
-<div align=center><img width="388" height="756" alt="image" src="https://github.com/user-attachments/assets/de74037b-86d6-427c-8d6b-e2adf95d16e0" /></div>
+<div align=center><img width="520" height="1080" alt="image" src="https://github.com/user-attachments/assets/f292d72c-be73-4953-8732-825275d5a7d0" /></div>
+
+
+
 
 ## Features
 **1. Select Image Source**
