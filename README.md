@@ -5,7 +5,8 @@
 
 软件的的GUI窗口，见下图：
 
-<div align=center><img width="388" height="756" alt="image" src="https://github.com/user-attachments/assets/d7259014-0df0-4054-93c6-f2356ea2c250" /></div>
+<div align=center><img width="520" height="1080" alt="image" src="https://github.com/user-attachments/assets/b5d4828a-b43c-464f-b8a5-48e9a7230b39" /></div>
+
 
 
 
@@ -43,7 +44,8 @@
 * 关闭程序GUI窗口，程序默认在后台继续运行，可以在状态栏的托盘区域看到程序图标。点击托盘中的程序图标，可以恢复GUI窗口，在图标上右键会弹出菜单，可以选择显示窗口或完全退出程序
 
 # 鸣谢
-* 此项目核心框架和GUI界面的代码由 [**GLM-5.3**](https://open.bigmodel.cn/) 生成
+* 此项目核心框架的代码由 [**GLM-5.3**](https://open.bigmodel.cn/) 生成
+* 此项目GUI界面的代码由 [**Kimi-K2.7-Code**](https://www.kimi.com/) 生成
 * GOES-R系列卫星云图下载链接提取的代码由 [**DeepSeek**](https://www.deepseek.com/) 生成
 * README的格式以及翻译由 [**Qwen**](https://www.tongyi.com/qianwen/) 生成
 * 此项目的想法来自于 [**wenkechen**](https://github.com/wenkechen) 的项目 [**MineEarth**](https://github.com/wenkechen/MineEarth) 。以前曾使用过这款程序，但存在一些问题，作者长期未更新，且图像源只有“向日葵8号”。遂，在AI的帮助下创建了此项目
