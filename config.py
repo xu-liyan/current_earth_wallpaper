@@ -10,7 +10,7 @@ OLD_PKL_FILE = 'wallpaperdata.pkl'      # 旧版配置：自动迁移后不再�
 
 VALID_SOURCES = ('风云4B', 'GOES-East', 'GOES-West')
 VALID_SCALES = ('铺满屏幕', '原始大小', '黄金比例', '更小尺寸')
-VALID_LANGUAGES = ('中文', 'English')
+VALID_LANGUAGES = ('中文', 'English', '日本語', '한국어')
 
 # 水印按钮显示“取消时间水印”时，说明水印当前处于开启状态
 _WATERMARK_ON_TEXTS = ('取消时间水印', 'Cancel time watermark')
